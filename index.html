@@ -1,0 +1,92 @@
+<html style="height:100%;touch-action:none" encoding="utf-8">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" href="style.css"/>
+</head>
+  <body style="height:100%;margin:0px;overflow:hidden" encoding="utf-8" >
+    <div style="height:80%;overflow:scroll">
+      <div style="width:100%;font-size:20px;z-index: 10;position: relative; ">
+        <div style="margin:0px;font-size:30px;color:white;background: linear-gradient(#1b7b1f,#125816);margin-top: 2px;padding: 4px;width: 100%;text-align:center;border: 0.3px solid black;">
+ Multispline Interpolation Demo<br>
+          <div style="width: 100%;position: absolute;border: 0.5px solid white;"></div>
+          <span style="font-size:20px"> Space chosen</span>
+          <select id="SelectOrder">
+            <option order="0" col="blue" interpolationof="$f(k)$" interpolationwith="$beta0$">S0 (#1)</option>
+            <option order="1" col="green" interpolationof="$f(k)$" interpolationwith="$beta1$">S1 (#2)</option>
+            <option order="1+2" col="purple" interpolationof="$f(k|2)$" interpolationwith="$beta1$  | $beta2$">S1+S2 (#2.5)</option>
+            <option order="2" col="red" interpolationof="$f(k)$" interpolationwith="$beta2$">S2 (#3)</option>
+            <option order="3" col="purple" interpolationof="$f(k)$" interpolationwith="$beta3$">S3 (#4)</option>
+            <option order="1+2+3" interpolationof="$f(k|3)$" interpolationwith="$beta1$ | $beta2$ | $beta3$" col="purple">S1+S2+S3 (#4.5)</option>
+            <option order="4" col="yellow" interpolationof="$f(k)$" interpolationwith="$beta4$">S4 (#5)</option>
+            <option order="5" col="red" interpolationof="$f(k)$" interpolationwith="$beta5$">S5 (#6)</option>
+            <option order="6" col="purple" interpolationof="$f(k)$" interpolationwith="$beta6$">S6 (#7)</option>
+            <option order="1+2+3+4" col="purple" interpolationof="$f(k|4)$" interpolationwith="$beta1$ | $beta2$ | $beta3$ | $beta4$">S1+S2+S3+S4 (#7)</option>
+            <option order="D S2+S3" col="purple" interpolationof="$f(k)$ | $f'(k)$" interpolationwith="$beta2$ | $beta3$">D S2+S3(#)</option>
+            <option order="D S2+S4" col="purple" interpolationof="$f(k+1|2)$ | $f'(k)$" interpolationwith="$beta2$ | $beta4$">D S2+S4(#)</option>
+            <option order="D S4+S5" col="purple" interpolationof="$f(k)$ | $f'(k)$" interpolationwith="$beta4$ | $beta5$">D S4+S5(#)</option>
+            <option order="D S1+S2+S3" col="purple" interpolationof="$f(k)$ | $f'(k)$ right and left" interpolationwith="$beta1$ | $beta2$ | $beta3$">D S1+S2+S3(#)</option>
+            <option order="D S1+S2" col="purple" interpolationof="$f(k)$ | $f'(k)$" interpolationwith="$beta1$ | $beta2$">D S1+S2(#)</option>
+            <option order="D2 S3+S5" col="purple" interpolationof="$f(k)$ | $f''(k)$" interpolationwith="$beta3$ | $beta5$">D2 S3+S5(#)</option>
+            <option order="D2 S3+S4" col="purple" interpolationof="$f(k)$ | $f''(k+1|2)$" interpolationwith="$beta3$ | $beta4$">D2 S3+S4(#)</option>
+            <option order="2D+" col="purple">2D</option>
+          </select>
+        </div>
+
+  </div>
+
+  <div id="measurements"></div>
+  <div id="leftpane">
+  <span style="display:none">Predefined curves</span>
+  <select style="display:none" id="PredefinedCurves">
+    <option value="0">0</option>
+    <option value="sinx">sin(x)</option>
+    <option value="sin2x">sin(2x)</option>
+    <option value="sin3x">sin(3x)</option>
+    <option value="x">x</option>
+    <option value="x2">~x2</option>
+    <option value="x6">~x6</option>
+    <option value="hat5">hat5</option>
+    <option value="rand">rand</option>
+    <option value="H1">H1</option>
+    <option value="H2">H2</option>
+    <option value="DS1S2_1">DS1S2_1</option>
+    <option value="DS1S2_2">DS1S2_2</option>
+
+  </select>
+  <span></span><span id="info"><p class="pinfo">Interpolation of</p><span class="spaninfo" id="interpolationof"></span><p class="pinfo">with</p><span id="interpolationwith" class="spaninfo"></span></span>
+</div>
+    <svg id="svg">
+      <defs>
+            <radialGradient id="g1" cx="50%" cy="50%" r="50%" fx="35%" fy="35%">
+            <stop stop-color="#a7e0a7" offset="0%"></stop>
+            <stop stop-color="#6cc36c" offset="30%"></stop>
+            <stop stop-color="#1c711c" offset="90%"></stop>
+            <stop stop-color="#014c04" offset="100%"></stop>
+        </radialGradient>
+        <radialGradient id="g2" cx="50%" cy="50%" r="50%" fx="35%" fy="35%">
+            <stop stop-color="#5bb7ff" offset="0%"></stop>
+            <stop stop-color="#008eff" offset="30%"></stop>
+            <stop stop-color="blue" offset="90%"></stop>
+            <stop stop-color="#014c04" offset="100%"></stop>
+        </radialGradient>
+  </defs>
+      <g id="Background">
+      </g>
+      <g id="Curve">
+      </g>
+      <path id="splinefit" style="fill: none;stroke: black;stroke-width: 0.05px;">
+    </svg>
+  </div>
+  <!-- <div id="console">
+  </div> -->
+  <div id="info2" style="height:20%">
+  </div>
+  </body>
+  <!-- <script src="./console.js"></script> -->
+  <!-- <script>
+    var cl = new cle("console");
+    </script> -->
+    <script src="main.js"></script>
+
+
+</html>
