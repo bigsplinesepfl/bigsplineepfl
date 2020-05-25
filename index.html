@@ -21,13 +21,13 @@
             <option order="5" col="red" interpolationof="$f(k)$" interpolationwith="$beta5$">S5 (#6)</option>
             <option order="6" col="purple" interpolationof="$f(k)$" interpolationwith="$beta6$">S6 (#7)</option>
             <option order="1+2+3+4" img="S1+S2+S3+S4.svg" col="purple" interpolationof="$f(k|4)$" interpolationwith="$beta1$ | $beta2$ | $beta3$ | $beta4$">S1+S2+S3+S4 (#7)</option>
-            <option order="D S2+S3" col="purple" interpolationof="$f(k)$ | $f'(k)$" interpolationwith="$beta2$ | $beta3$">D S2+S3(#)</option>
-            <option order="D S2+S4" col="purple" interpolationof="$f(k+1|2)$ | $f'(k)$" interpolationwith="$beta2$ | $beta4$">D S2+S4(#)</option>
-            <option order="D S4+S5" col="purple" interpolationof="$f(k)$ | $f'(k)$" interpolationwith="$beta4$ | $beta5$">D S4+S5(#)</option>
-            <option order="D S1+S2+S3" col="purple" interpolationof="$f(k)$ | $f'(k)$ right and left" interpolationwith="$beta1$ | $beta2$ | $beta3$">D S1+S2+S3(#)</option>
+            <option order="D S2+S3" img="D S2+S3.svg" col="purple" interpolationof="$f(k)$ | $f'(k)$" interpolationwith="$beta2$ | $beta3$">D S2+S3(#)</option>
+            <option order="D S2+S4" img="D S2+S4.svg" col="purple" interpolationof="$f(k+1|2)$ | $f'(k)$" interpolationwith="$beta2$ | $beta4$">D S2+S4(#)</option>
+            <option order="D S4+S5" img="D S4+S5.svg" col="purple" interpolationof="$f(k)$ | $f'(k)$" interpolationwith="$beta4$ | $beta5$">D S4+S5(#)</option>
+            <option order="D S1+S2+S3" img="D S1+S2+S3.svg" col="purple" interpolationof="$f(k)$ | $f'(k)$ right and left" interpolationwith="$beta1$ | $beta2$ | $beta3$">D S1+S2+S3(#)</option>
             <option order="D S1+S2" col="purple" interpolationof="$f(k)$ | $f'(k)$" interpolationwith="$beta1$ | $beta2$">D S1+S2(#)</option>
             <option order="D2 S3+S5" col="purple" interpolationof="$f(k)$ | $f''(k)$" interpolationwith="$beta3$ | $beta5$">D2 S3+S5(#)</option>
-            <option order="D2 S3+S4" img="D2 S3+S4.svg" col="purple" interpolationof="$f(k)$ | $f''(k+1|2)$" interpolationwith="$beta3$ | $beta4$">D2 S3+S4(#)</option>
+            <option order="D2 S3+S4" img="D2 S3+S4.svg" comment="The filter is unstable in others cases:<br> f(k),f'(k) <br> f(k),f'(k+1/2) <br>f(k),f''(k)<br> ..." col="purple" interpolationof="$f(k)$ | $f''(k+1|2)$" interpolationwith="$beta3$ | $beta4$">D2 S3+S4(#)</option>
             <option order="2D+" col="purple">2D</option>
           </select>
         </div>
@@ -61,6 +61,8 @@
     <span id="interpolationwith" class="spaninfo"></span>
     <p class="pinfo">Shortest Basis</p>
     <span id="imggeneratingfunction"></span>
+    <p class="pinfo">Comments</p>
+    <span id="comment"></span>
   </span>
 </div>
     <svg id="svg">

@@ -42,6 +42,7 @@ document.getElementById("SelectOrder").addEventListener("change",function(){
   document.getElementById("interpolationwith").innerHTML = Latex(this.options[this.selectedIndex].getAttribute('interpolationwith')||'');
   console.log("<img src=\"./images/"+(this.options[this.selectedIndex].getAttribute('img')||'')+"\">")
   document.getElementById("imggeneratingfunction").innerHTML = "<img src=\"./images/"+(this.options[this.selectedIndex].getAttribute('img')||'')+"\">"
+  document.getElementById("comment").innerHTML = this.options[this.selectedIndex].getAttribute('comment')||''
   Points.redraw();
 })
 
