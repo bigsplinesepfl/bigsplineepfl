@@ -40,6 +40,7 @@ document.getElementById("SelectOrder").addEventListener("change",function(){
 
   document.getElementById("interpolationof").innerHTML = Latex(this.options[this.selectedIndex].getAttribute('interpolationof')||'');
   document.getElementById("interpolationwith").innerHTML = Latex(this.options[this.selectedIndex].getAttribute('interpolationwith')||'');
+  document.getElementById("imggeneratingfunction").innerHTML = "<img src=\"./images/"+(this.options[this.selectedIndex].getAttribute('img')||'')+"\">"
   Points.redraw();
 })
 

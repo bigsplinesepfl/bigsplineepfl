@@ -40,7 +40,7 @@ body{
   background: #525252;
   padding: 3px;
   border-radius: 2px;
-  width: 150px;
+  width: 220px;
   height: 100%;
   position: absolute;
   z-index: 3;
@@ -50,7 +50,7 @@ body{
 #svg{
   position: absolute;
   right: 0;
-  width: calc(100% - 150px);
+  width: calc(100% - 220px);
   height: 100%;
   border: 2px solid black;
 }

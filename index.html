@@ -13,14 +13,14 @@
           <select id="SelectOrder">
             <option order="0" col="blue" interpolationof="$f(k)$" interpolationwith="$beta0$">S0 (#1)</option>
             <option order="1" col="green" interpolationof="$f(k)$" interpolationwith="$beta1$">S1 (#2)</option>
-            <option order="1+2" col="purple" interpolationof="$f(k|2)$" interpolationwith="$beta1$  | $beta2$">S1+S2 (#2.5)</option>
+            <option order="1+2" img="S1+S2.svg" col="purple" interpolationof="$f(k|2)$" interpolationwith="$beta1$  | $beta2$">S1+S2 (#2.5)</option>
             <option order="2" col="red" interpolationof="$f(k)$" interpolationwith="$beta2$">S2 (#3)</option>
             <option order="3" col="purple" interpolationof="$f(k)$" interpolationwith="$beta3$">S3 (#4)</option>
-            <option order="1+2+3" interpolationof="$f(k|3)$" interpolationwith="$beta1$ | $beta2$ | $beta3$" col="purple">S1+S2+S3 (#4.5)</option>
+            <option order="1+2+3" img="S1+S2+S3.svg" interpolationof="$f(k|3)$" interpolationwith="$beta1$ | $beta2$ | $beta3$" col="purple">S1+S2+S3 (#4.5)</option>
             <option order="4" col="yellow" interpolationof="$f(k)$" interpolationwith="$beta4$">S4 (#5)</option>
             <option order="5" col="red" interpolationof="$f(k)$" interpolationwith="$beta5$">S5 (#6)</option>
             <option order="6" col="purple" interpolationof="$f(k)$" interpolationwith="$beta6$">S6 (#7)</option>
-            <option order="1+2+3+4" col="purple" interpolationof="$f(k|4)$" interpolationwith="$beta1$ | $beta2$ | $beta3$ | $beta4$">S1+S2+S3+S4 (#7)</option>
+            <option order="1+2+3+4" img="S1+S2+S3+S4.svg" col="purple" interpolationof="$f(k|4)$" interpolationwith="$beta1$ | $beta2$ | $beta3$ | $beta4$">S1+S2+S3+S4 (#7)</option>
             <option order="D S2+S3" col="purple" interpolationof="$f(k)$ | $f'(k)$" interpolationwith="$beta2$ | $beta3$">D S2+S3(#)</option>
             <option order="D S2+S4" col="purple" interpolationof="$f(k+1|2)$ | $f'(k)$" interpolationwith="$beta2$ | $beta4$">D S2+S4(#)</option>
             <option order="D S4+S5" col="purple" interpolationof="$f(k)$ | $f'(k)$" interpolationwith="$beta4$ | $beta5$">D S4+S5(#)</option>
@@ -53,7 +53,7 @@
     <option value="DS1S2_2">DS1S2_2</option>
 
   </select>
-  <span></span><span id="info"><p class="pinfo">Interpolation of</p><span class="spaninfo" id="interpolationof"></span><p class="pinfo">with</p><span id="interpolationwith" class="spaninfo"></span></span>
+  <span></span><span id="info"><p class="pinfo">Interpolation of</p><span class="spaninfo" id="interpolationof"></span><p class="pinfo">with</p><span id="interpolationwith" class="spaninfo"></span><p class="pinfo">Shortest Basis</p><span id="imggeneratingfunction"></span></span>
 </div>
     <svg id="svg">
       <defs>
