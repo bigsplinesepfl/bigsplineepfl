@@ -9,6 +9,7 @@ var Ym = 0;//Mouse Y position
 var eps = 0.000001;//epsilon, fitting error controle
 var ordre = 0;//Spline order
 var MultiSpline = "";//MultiSpline?
+var tini = 0;
 //Poles registration
 var poles = {};
 poles[2] = [Math.sqrt(8)-3];
@@ -43,6 +44,7 @@ document.getElementById("SelectOrder").addEventListener("change",function(){
   console.log("<img src=\"./images/"+(this.options[this.selectedIndex].getAttribute('img')||'')+"\">")
   document.getElementById("imggeneratingfunction").innerHTML = "<img src=\"./images/"+(this.options[this.selectedIndex].getAttribute('img')||'')+"\">"
   document.getElementById("comment").innerHTML = this.options[this.selectedIndex].getAttribute('comment')||''
+
   Points.redraw();
 })
 
@@ -642,6 +644,7 @@ class p{
     this.dom().setAttribute('stroke',col)
   }
   redraw(){
+    tini = performance.now()
     Points.removeHandles();
     var xl = this.axis.val;
     //Coeffs
@@ -710,6 +713,7 @@ class p{
     //
 
     this.dom().setAttribute('d',List2Path(xl,s));
+    console.log(performance.now()-tini,s[0])
   }
 }
 
@@ -1636,3 +1640,20 @@ function Approx(nbre,dx){
 
 var event = new Event('change');
 document.getElementById("SelectOrder").dispatchEvent(event);
+
+document.getElementById("Languette").addEventListener("drag",function(e){
+  if(e.clientX>100){
+    document.getElementById("leftpane").style.width = e.clientX
+  }
+})
+
+document.getElementById("Languette").addEventListener("dragstart",function(e){
+    document.getElementById("Languette").style.backgroundColor = "#00000000"
+
+
+})
+
+document.getElementById("Languette").addEventListener("dragend",function(e){
+    document.getElementById("Languette").style.backgroundColor = "black"
+
+})
