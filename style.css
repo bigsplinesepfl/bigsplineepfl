@@ -45,6 +45,9 @@ body{
   position: absolute;
   z-index: 3;
   border: 2px solid black;
+  border-right-width: 0px;
+  box-shadow: inset -3px 0px 0 1px black;
+  overflow-y: scroll;
 }
 
 #svg{
@@ -53,6 +56,39 @@ body{
   width: calc(100% - 220px);
   height: 100%;
   border: 2px solid black;
+}
+
+#controlpane{
+  position: absolute;
+  right: 0;
+  width: calc(100% - 220px);
+  border: 0.5px solid black;
+  background: #e2e2e2;
+  /* padding-left: 24px; */
+}
+
+#showControlPoints{
+  background-image: url('./images/eye.svg');
+}
+
+.control{
+  width: 15;
+  height: 15;
+  margin: 6;
+  margin-left: 10px;
+  padding: 4px;
+  /* background-size: 20px; */
+  background-repeat: no-repeat;
+  background-position: center;
+  padding-left: 10px;
+}
+
+.control:hover{
+  cursor:pointer;
+  transform:scale(1.2);
+  transform-origin:center;
+  box-shadow:0px 0px 1px 0px #292929;
+  border-radius:1px;
 }
 
 .pinfo{
@@ -85,7 +121,7 @@ body{
     z-index: 1;
     right: 0px;
     transform: translateX(+50%);
-    background-image: url(./images/ChevronRight.svg);
+    /* background-image: url(./images/ChevronRight.svg); */
     background-size: 8px;
     background-repeat: no-repeat;
     background-position: center;

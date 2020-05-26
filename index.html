@@ -11,24 +11,36 @@
           <div style="width: 100%;position: absolute;border: 0.5px solid white;"></div>
           <span style="font-size:20px"> Space chosen</span>
           <select id="SelectOrder">
-            <option order="0" col="blue" interpolationof="$f(k)$" interpolationwith="$beta0$">S0 (#1)</option>
-            <option order="1" col="green" interpolationof="$f(k)$" interpolationwith="$beta1$">S1 (#2)</option>
-            <option order="1+2" img="S1+S2.svg" col="purple" interpolationof="$f(k|2)$" interpolationwith="$beta1$  | $beta2$">S1+S2 (#2.5)</option>
-            <option order="2" col="red" interpolationof="$f(k)$" interpolationwith="$beta2$">S2 (#3)</option>
-            <option order="3" col="purple" interpolationof="$f(k)$" interpolationwith="$beta3$">S3 (#4)</option>
-            <option order="1+2+3" img="S1+S2+S3.svg" interpolationof="$f(k|3)$" interpolationwith="$beta1$ | $beta2$ | $beta3$" col="purple">S1+S2+S3 (#4.5)</option>
-            <option order="4" col="yellow" interpolationof="$f(k)$" interpolationwith="$beta4$">S4 (#5)</option>
-            <option order="5" col="red" interpolationof="$f(k)$" interpolationwith="$beta5$">S5 (#6)</option>
-            <option order="6" col="purple" interpolationof="$f(k)$" interpolationwith="$beta6$">S6 (#7)</option>
-            <option order="1+2+3+4" img="S1+S2+S3+S4.svg" col="purple" interpolationof="$f(k|4)$" interpolationwith="$beta1$ | $beta2$ | $beta3$ | $beta4$">S1+S2+S3+S4 (#7)</option>
-            <option order="D S2+S3" img="D S2+S3.svg" col="purple" interpolationof="$f(k)$ | $f'(k)$" interpolationwith="$beta2$ | $beta3$">D S2+S3(#)</option>
-            <option order="D S2+S4" img="D S2+S4.svg" col="purple" interpolationof="$f(k+1|2)$ | $f'(k)$" interpolationwith="$beta2$ | $beta4$">D S2+S4(#)</option>
-            <option order="D S4+S5" img="D S4+S5.svg" col="purple" interpolationof="$f(k)$ | $f'(k)$" interpolationwith="$beta4$ | $beta5$">D S4+S5(#)</option>
-            <option order="D S1+S2+S3" img="D S1+S2+S3.svg" col="purple" interpolationof="$f(k)$ | $f'(k)$ right and left" interpolationwith="$beta1$ | $beta2$ | $beta3$">D S1+S2+S3(#)</option>
-            <option order="D S1+S2" col="purple" interpolationof="$f(k)$ | $f'(k)$" interpolationwith="$beta1$ | $beta2$">D S1+S2(#)</option>
-            <option order="D2 S3+S5" col="purple" interpolationof="$f(k)$ | $f''(k)$" interpolationwith="$beta3$ | $beta5$">D2 S3+S5(#)</option>
-            <option order="D2 S3+S4" img="D2 S3+S4.svg" comment="The filter is unstable in others cases:<br> f(k),f'(k) <br> f(k),f'(k+1/2) <br>f(k),f''(k)<br> ..." col="purple" interpolationof="$f(k)$ | $f''(k+1|2)$" interpolationwith="$beta3$ | $beta4$">D2 S3+S4(#)</option>
-            <option order="2D+" col="purple">2D</option>
+            <optgroup label ="Value">
+              <option order="0" nroot="0" col="blue" interpolationof="$f(k)$" interpolationwith="$beta0$">S0 (#1)</option>
+              <option order="1" nroot="0" col="green" interpolationof="$f(k)$" interpolationwith="$beta1$">S1 (#2)</option>
+              <option order="1+2" nroot="0" img="S1+S2.svg" col="purple" interpolationof="$f(k|2)$" interpolationwith="$beta1$  | $beta2$">S1+S2 (#3)</option>
+              <option order="2" nroot="2" col="red" interpolationof="$f(k)$" interpolationwith="$beta2$">S2 (#3)</option>
+              <option order="3" nroot="2" col="purple" interpolationof="$f(k)$" interpolationwith="$beta3$">S3 (#4)</option>
+              <option order="1+2+3" nroot="0" img="S1+S2+S3.svg" interpolationof="$f(k|3)$" interpolationwith="$beta1$ | $beta2$ | $beta3$" col="purple">S1+S2+S3 (#4)</option>
+              <option order="4" nroot="4" col="yellow" interpolationof="$f(k)$" interpolationwith="$beta4$">S4 (#5)</option>
+              <option order="3+4" nroot="2" img="D2 S3+S4.svg" col="purple" interpolationof="$f(k|2)$" interpolationwith="$beta3$ and $beta4$">S3+S4 (#5)</option>
+              <option order="1+2+3+4" nroot="1" img="S1+S2+S3+S4.svg" col="purple" interpolationof="$f(k|4)$" interpolationwith="$beta1$ | $beta2$ | $beta3$ | $beta4$">S1+S2+S3+S4 (#5)</option>
+              <option order="5" nroot="4" col="red" interpolationof="$f(k)$" interpolationwith="$beta5$">S5 (#6)</option>
+              <option order="6" nroot="6" col="purple" interpolationof="$f(k)$" interpolationwith="$beta6$">S6 (#7)</option>
+            </optgroup>
+            <optgroup label ="Value and derivative">
+              <option nroot="0" order="D S2+S3" img="D S2+S3.svg" col="purple" interpolationof="$f(k)$ | $f'(k)$" interpolationwith="$beta2$ | $beta3$">D S2+S3(#)</option>
+              <option nroot="2" order="D S2+S4" img="D S2+S4.svg" col="purple" interpolationof="$f(k+1|2)$ | $f'(k)$" interpolationwith="$beta2$ | $beta4$">D S2+S4(#)</option>
+              <option nroot="2" order="D S4+S5" img="D S4+S5.svg" col="purple" interpolationof="$f(k)$ | $f'(k)$" interpolationwith="$beta4$ | $beta5$">D S4+S5(#)</option>
+              <option nroot="0" order="D S1+S2+S3" img="D S1+S2+S3.svg" col="purple" interpolationof="$f(k)$ | $f'(k)$ right and left" interpolationwith="$beta1$ | $beta2$ | $beta3$">D S1+S2+S3(#)</option>
+              <option nroot="0" order="D S1+S2" col="purple" interpolationof="$f(k)$ | $f'(k)$" interpolationwith="$beta1$ | $beta2$">D S1+S2(#)</option>
+            </optgroup>
+
+            <optgroup label="Value and second derivative">
+              <option order="D2 S3+S5" col="purple" interpolationof="$f(k)$ | $f''(k)$" interpolationwith="$beta3$ | $beta5$">D2 S3+S5(#)</option>
+              <option order="D2 S3+S4" img="D2 S3+S4.svg" comment="The filter is unstable in others cases:<br> f(k),f'(k) <br> f(k),f'(k+1/2) <br>f(k),f''(k)<br> ..." col="purple" interpolationof="$f(k)$ | $f''(k+1|2)$" interpolationwith="$beta3$ | $beta4$">D2 S3+S4(#)</option>
+            </optgroup>
+            <optgroup label="2D">
+              <option order="2D S1+S2" col="purple">2D S1+S2</option>
+              <option order="2D S1+S2+S3" col="purple">2D S1+S2+S3</option>
+              <option order="2D2 S3+S4" col="purple">2D2 S3+S4</option>
+            </optgroup>
           </select>
         </div>
 
@@ -60,33 +72,40 @@
     <span class="spaninfo" id="interpolationof"></span>
     <p class="pinfo">with</p>
     <span id="interpolationwith" class="spaninfo"></span>
+    <p class="pinfo">Number of roots</p>
+    <span id="nroot" class="spaninfo"></span>
     <p class="pinfo">Shortest Basis</p>
     <span id="imggeneratingfunction"></span>
     <p class="pinfo">Comments</p>
     <div id="comment"></div>
   </span>
 </div>
+<div id="rightpane">
     <svg id="svg">
       <defs>
-            <radialGradient id="g1" cx="50%" cy="50%" r="50%" fx="35%" fy="35%">
-            <stop stop-color="#a7e0a7" offset="0%"></stop>
-            <stop stop-color="#6cc36c" offset="30%"></stop>
-            <stop stop-color="#1c711c" offset="90%"></stop>
-            <stop stop-color="#014c04" offset="100%"></stop>
+        <radialGradient id="g1" cx="50%" cy="50%" r="50%" fx="35%" fy="35%">
+          <stop stop-color="#a7e0a7" offset="0%"></stop>
+          <stop stop-color="#6cc36c" offset="30%"></stop>
+          <stop stop-color="#1c711c" offset="90%"></stop>
+          <stop stop-color="#014c04" offset="100%"></stop>
         </radialGradient>
         <radialGradient id="g2" cx="50%" cy="50%" r="50%" fx="35%" fy="35%">
-            <stop stop-color="#5bb7ff" offset="0%"></stop>
-            <stop stop-color="#008eff" offset="30%"></stop>
-            <stop stop-color="blue" offset="90%"></stop>
-            <stop stop-color="#014c04" offset="100%"></stop>
+          <stop stop-color="#5bb7ff" offset="0%"></stop>
+          <stop stop-color="#008eff" offset="30%"></stop>
+          <stop stop-color="blue" offset="90%"></stop>
+          <stop stop-color="#014c04" offset="100%"></stop>
         </radialGradient>
-  </defs>
+      </defs>
       <g id="Background">
       </g>
       <g id="Curve">
       </g>
       <path id="splinefit" style="fill: none;stroke: black;stroke-width: 0.05px;">
     </svg>
+    <div id="controlpane">
+      <div class="control" visible="true" id="showControlPoints">
+      </div>
+    </div>
   </div>
   <!-- <div id="console">
   </div> -->

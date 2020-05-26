@@ -42,9 +42,9 @@ document.getElementById("SelectOrder").addEventListener("change",function(){
   document.getElementById("interpolationof").innerHTML = Latex(this.options[this.selectedIndex].getAttribute('interpolationof')||'');
   document.getElementById("interpolationwith").innerHTML = Latex(this.options[this.selectedIndex].getAttribute('interpolationwith')||'');
   console.log("<img src=\"./images/"+(this.options[this.selectedIndex].getAttribute('img')||'')+"\">")
-  document.getElementById("imggeneratingfunction").innerHTML = "<img src=\"./images/"+(this.options[this.selectedIndex].getAttribute('img')||'')+"\">"
+  document.getElementById("imggeneratingfunction").innerHTML = "<img style=\"border-radius:2px;width:calc(100% - 28px);border:2px solid gray\" src=\"./images/"+(this.options[this.selectedIndex].getAttribute('img')||'blank.svg')+"\">"
   document.getElementById("comment").innerHTML = this.options[this.selectedIndex].getAttribute('comment')||''
-
+  document.getElementById("nroot").innerHTML = this.options[this.selectedIndex].getAttribute('nroot')||''
   Points.redraw();
 })
 
@@ -169,7 +169,7 @@ document.onmousemove = function(e){
         if(dragging.groupHandles){
           var theta = Math.atan((PosM[1]-dragging.y)/(PosM[0]-dragging.x))/Math.PI*180;
           dragging.theta = theta;
-          var dist = Math.max(0,Math.sqrt((PosM[1]-dragging.y)**2+Math.min(PosM[0]-dragging.x,-0)**2))
+          var dist = Math.max(0,Math.sqrt((PosM[1]-dragging.y)**2+(PosM[0]-dragging.x)**2))
           dragging.l1 = dist;
           dragging.l2 = dist;
         }
@@ -177,13 +177,22 @@ document.onmousemove = function(e){
           currentHandle = (draggingSort.indexOf("1")>-1?1:2);
           if(currentHandle == 1){
             var theta = Math.atan((PosM[1]-dragging.y)/Math.min(PosM[0]-dragging.x,-0))/Math.PI*180;
-            var dist = Math.max(0,Math.sqrt((PosM[1]-dragging.y)**2+Math.min(PosM[0]-dragging.x,-0)**2))
+            var dist = Math.max(0,Math.sqrt((PosM[1]-dragging.y)**2+Math.min(PosM[0]-dragging.x,-0)**2));
+            if(MultiSpline!=0 && MultiSpline.indexOf("2D") != -1 & (PosM[0]-dragging.x)>0){
+              theta = 180 - Math.atan((PosM[1]-dragging.y)/Math.min(-PosM[0]+dragging.x,-0))/Math.PI*180;
+              dist = Math.max(0,Math.sqrt((PosM[1]-dragging.y)**2+Math.min(-PosM[0]+dragging.x,-0)**2));
+            }
           }
           else{
             var theta = Math.atan((PosM[1]-dragging.y)/Math.max(PosM[0]-dragging.x,0))/Math.PI*180;
             var dist = Math.max(0,Math.sqrt((PosM[1]-dragging.y)**2+Math.max(PosM[0]-dragging.x,0)**2))
+            if(MultiSpline!=0 && MultiSpline.indexOf("2D") != -1 & (PosM[0]-dragging.x)<0){
+              theta = 180 - Math.atan((PosM[1]-dragging.y)/Math.max(-PosM[0]+dragging.x,0))/Math.PI*180;
+              dist = Math.max(0,Math.sqrt((PosM[1]-dragging.y)**2+Math.max(-PosM[0]+dragging.x,0)**2))
+            }
           }
           dragging["theta"+currentHandle] = Math.min(Math.max(theta,-90),90);// + (parseFloat(currentHandle)-1)*180;
+          dragging["theta"+currentHandle] =theta;
           dragging["l"+currentHandle] = dist;
         }
         dragging.redraw();
@@ -193,12 +202,18 @@ document.onmousemove = function(e){
       var y0 = Math.min(height,Math.max(0,ChangementRepere(0,Ym)[1]));
         dragging.moveY(y0)
         if(MultiSpline!=0 && MultiSpline.indexOf("2D") != -1){
-          dragging.moveX(Math.min(width,Math.max(0,ChangementRepere(0,Xm)[1])))
+          dragging.moveX(Math.min(width,Math.max(0,ChangementRepere(Xm,0)[0])))
         }
         Points.redraw();
         document.getElementById("measurements").innerHTML = Approx(-y0+height/2,0.01)
     }
 
+  }
+  else{
+    // var x0 = 0;
+    // var y0 = 0;
+    // [x0,y0] = ChangementRepere(Xm,Ym);
+    // Points.showclosestelement(x0,y0)
   }
 }
 
@@ -499,6 +514,19 @@ class p{
     return(this.val.length)
   }
 
+  showclosestelement(x,y){
+    var dmin = Infinity
+    var i0 = 0
+    for(var i = 0;i<this.val.length;i++){
+      var d0 = (this.val[i].x-x)**2 + (this.val[i].y-y)**2;
+      this.val[i].hide()
+      if(d0<dmin){
+        dmin = d0
+        i0 = i
+      }
+    }
+    this.val[i0].show()
+  }
   id(n){
     for(var elt of this.val){
       if(elt.id == n){
@@ -583,6 +611,45 @@ class p{
     return(ans)
   }
 
+  DY_l2D(){
+    var ans = [];
+    for(var elt of this.val){
+      if(elt.hasHandle){
+        ans.push(Math.sin(elt.theta1/180*Math.PI)*elt.l1)
+      }
+    }
+    return(ans)
+  }
+
+  DY_r2D(){
+    var ans = [];
+    for(var elt of this.val){
+      if(elt.hasHandle){
+        ans.push(Math.sin(elt.theta2/180*Math.PI)*elt.l2)
+      }
+    }
+    return(ans)
+  }
+
+  DX_l2D(){
+    var ans = [];
+    for(var elt of this.val){
+      if(elt.hasHandle){
+        ans.push(Math.cos(elt.theta1/180*Math.PI)*elt.l1)
+      }
+    }
+    return(ans)
+  }
+
+  DX_r2D(){
+    var ans = [];
+    for(var elt of this.val){
+      if(elt.hasHandle){
+        ans.push(Math.cos(elt.theta2/180*Math.PI)*elt.l2)
+      }
+    }
+    return(ans)
+  }
   //Liste des posY et derivee pour interpolation derivee
   posYDY(){
     var ans = [];
@@ -654,18 +721,29 @@ class p{
     else{
 
       if(MultiSpline.indexOf("D") == -1){
-        //if(MultiSpline.inde)
-        var s = FitMulti(this.axis.val,this.posY());
+        if(MultiSpline == "3+4"){
+          var s = FitS3S4(this.axis.val,this.posY())
+          //var s = FitHermite(this.axis.val,this.posYDY());
+        }
+        else{
+          var s = FitMulti(this.axis.val,this.posY());
+        }
 
       }
-      else if(MultiSpline == "2D+"){
-      //   Points.removeHandles();
-      //   var s = Fit(this.axis.val,ConvertToInterpolationCoefficients(this.posY(),poles[ordre],eps));
-      //   var xl = Fit(this.axis.val,ConvertToInterpolationCoefficients(this.posX2D(),poles[ordre],eps));
+      else if(MultiSpline == "2D S1+S2+S3"){
+      Points.addHandles(3,false);
+      var s = FitHermiteS1S2S3(this.axis.val,intercal([this.posY(),this.DY_l2D(),this.DY_r2D()]));
+      var xl = FitHermiteS1S2S3(this.axis.val,intercal([this.posX2D(),this.DX_l2D(),this.DX_r2D()]));
+      }
+      else if(MultiSpline == "2D2 S3+S4"){
       Points.addHandles();
-      var s = FitHermite(this.axis.val,intercal([this.posY(),this.DY2D()]))
-
-      var xl = FitHermite(this.axis.val,intercal([this.posX2D(),this.DX2D()]))
+      var s = FitH1H2S3S4(this.axis.val,this.posY(),this.DY2D())
+      var xl = FitH1H2S3S4(this.axis.val,this.posX2D(),this.DX2D())
+      }
+      else if(MultiSpline == "2D S1+S2"){
+      Points.addHandles(3,false);
+      var s = FitDS1S2(this.axis.val,intercal([this.posY(),this.DY_l2D()]));
+      var xl = FitDS1S2(this.axis.val,intercal([this.posX2D(),this.DX_l2D()]));
       }
       else{
         if(MultiSpline == "D S4+S5"){
@@ -1049,7 +1127,7 @@ function FitDS1S2(x,c){
     var i0 = Math.floor(xi/N);
     valtoadd += (c[N*i0])*DS1S2_1(xi-i0*N)
     if(N*i0+3>c.length-1){
-      valtoadd = (c[N*i0+1])*DS1S2_2(xi-(i0+1)*N)
+      valtoadd += (c[N*i0+1])*DS1S2_2(xi-(i0+1)*N)
     }
     else{
       valtoadd += (c[N*i0+3])*DS1S2_2(xi-(i0+1)*N)
@@ -1167,7 +1245,7 @@ function ConvertToInterpolationCoefficients(c,z,Tolerance){
   var NbPoles = z.length;
   var Lambda = 1.0
   //Cas genral on retourne la reponse impulsionnelle de 1/produit (1-z0z**-1)(1-z0**-1z**-1)
-  if(MultiSpline != 0 && MultiSpline.indexOf("2D") == -1){
+  if(MultiSpline != 0 && (MultiSpline == "2D2 S3+S4" | MultiSpline.indexOf("2D") == -1)){
     for(var k =0;k<NbPoles;k++){
         c[0] = InitialCausalCoefficient(c, DataLength, z[k], Tolerance)
         //Causal Filtering
@@ -1255,16 +1333,18 @@ function FitH1H2S3S5(x,Y,DDY){
   //DY = dérivée
    //Voir rapport pour explications
    //C11 0.125 z -0.125  & -0.1z+0.1
+   //On multiplie DDY sinon pas pratique
+   var coeffDDY = 5;
    var C1 = Y.map(function(a, i){
      ip1 = (i+1)>Y.length-1?i-1:i+1;
      im1 = i-1<0?i+1:i-1;
-       return(-30/7*(Y[ip1]+2/30*DDY[ip1]))
+       return(-30/7*(Y[ip1]+2/30*coeffDDY*DDY[ip1]))
    });
 
    var C2 = Y.map(function(a, i){
      ip1 = (i+1)>Y.length-1?i-1:i+1;
      im1 = i-1<0?i+1:i-1;
-       return(-30/7*(2*Y[i] - Y[ip1] - Y[im1] + 1/6*DDY[ip1]+ 1/6*DDY[im1] + 4/6*DDY[i]))
+       return(-30/7*(2*Y[i] - Y[ip1] - Y[im1] + 1/6*coeffDDY*DDY[ip1]+ 1/6*coeffDDY*DDY[im1] + 4/6*coeffDDY*DDY[i]))
    });
    ordre = 2
 
@@ -1272,6 +1352,38 @@ function FitH1H2S3S5(x,Y,DDY){
    C2 = ConvertToInterpolationCoefficients(C2,[-8/7+Math.sqrt(15)/7],eps)
 
    return(FitNFunction(x,[C1,C2],[[H1H2S3S5_1,4],[H1H2S3S5_2,4]]))
+
+}
+
+function FitS3S4(x,Y){
+
+  //Y = pos function en y
+  //DY = dérivée
+   //Voir rapport pour explications
+   //C11 0.125 z -0.125  & -0.1z+0.1
+   var C1 = []
+   for(var i=0;i<Math.floor(Y.length/2);i++){
+     i0 = 2*i
+     ip1 = (i0+2)>Y.length-1?i0-2:i0+2;
+     im1 = i0-2<0?i0+2:i0-2;
+     C1[i] = (-(Y[ip1] + Y[im1] - 8 * Y[i0]))
+   }
+
+   var C2 = []
+   for(var i=0;i<Math.floor(Y.length/2);i++){
+     i0 = 2*i
+     i1 = Math.min(i0+1,Y.length-1)
+     ip1 = (i0+2)>Y.length-1?i0-2:i0+2;
+     im1 = i0-2<0?i0+2:i0-2;
+    C2[i] = (-5*(Y[ip1] + Y[i0])+16*Y[i1])
+   }
+
+   ordre = 2
+   console.log(C1,C2)
+   C1 = ConvertToInterpolationCoefficients(C1,[4-Math.sqrt(15)],eps)
+   C2 = ConvertToInterpolationCoefficients(C2,[4-Math.sqrt(15)],eps)
+   console.log(C1,C2)
+   return(FitNFunction(x,[C1,C2],[[H1H2S3S4_1,4],[H1H2S3S4_2,4]]))
 
 }
 
@@ -1300,6 +1412,8 @@ function FitH1H2S2S4(x,Y,DY){
 }
 
 function FitH1H2S3S4(x,Y,DY){
+  //On multiplie DDY sinon pas pratique
+  var coeffDDY = 5;
   //Y = pos function en y
   //DY = dérivée, mais on doit multiplier par 2
    //Voir rapport pour explications
@@ -1311,9 +1425,8 @@ function FitH1H2S3S4(x,Y,DY){
    var C2 = Y.map(function(a, i){
      ip1 = (i+1)>Y.length-1?i-1:i+1;
      im1 = i-1<0?i+1:i-1;
-       return(Y[i]/2 + Y[ip1]/2 - DY[ip1]/6)
+       return(Y[i]/2 + Y[ip1]/2 - coeffDDY*DY[ip1]/6)
    });
-
    return(FitNFunction(x,[C1,C2],[[H1H2S3S4_1,4],[H1H2S3S4_2,4]]))
 
 }
@@ -1643,7 +1756,7 @@ document.getElementById("SelectOrder").dispatchEvent(event);
 
 document.getElementById("Languette").addEventListener("drag",function(e){
   if(e.clientX>100){
-    document.getElementById("leftpane").style.width = e.clientX
+    document.getElementById("leftpane").style.width = Math.min(Math.max(e.clientX,220),window.innerWidth-10)
   }
 })
 
@@ -1657,3 +1770,28 @@ document.getElementById("Languette").addEventListener("dragend",function(e){
     document.getElementById("Languette").style.backgroundColor = "black"
 
 })
+
+
+//Control buttons
+Array.from(document.getElementsByClassName("control")).forEach(function(element) {
+  element.addEventListener('click', function(){
+    console.log(element)
+    switch (element.id) {
+      case "showControlPoints":
+        if(element.getAttribute("visible")=="true"){
+          Points.hideControlPoints()
+          element.setAttribute("visible","false")
+        }
+        else{
+          Points.showControlPoints()
+          element.setAttribute("visible","true")
+          Points.redraw()
+        }
+
+
+        break;
+      default:
+
+    }
+  });
+});
