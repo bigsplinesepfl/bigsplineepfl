@@ -674,6 +674,10 @@ class p{
     return document.getElementById("splinefit");
   }
 
+  dom2(){
+    return document.getElementById("splinefit2");
+  }
+
   removeHandles(){
     for(var elt of this.val){
       elt.removeHandles();
@@ -791,7 +795,14 @@ class p{
     //
 
     this.dom().setAttribute('d',List2Path(xl,s));
-    console.log(performance.now()-tini,s[0])
+    // var ordreold = ordre;
+    // ordre = 3
+    // var MultiSplineold = MultiSpline
+    // MultiSpline = 0;
+    // var s = Fit(this.axis.val,ConvertToInterpolationCoefficients(this.posY(),poles[ordre],eps));
+    // this.dom2().setAttribute('d',List2Path(xl,s));
+    // ordre = ordreold;
+    // MultiSpline = MultiSplineold;
   }
 }
 
@@ -1239,7 +1250,8 @@ function Fitc12t12(x,cc,ct){
   return(ans)
 }
 
-function ConvertToInterpolationCoefficients(c,z,Tolerance){
+function ConvertToInterpolationCoefficients(c,z,Tolerance,opt){
+  opt = opt || {};
   var DataLength = c.length
   z = z || [];
   var NbPoles = z.length;
@@ -1264,7 +1276,7 @@ function ConvertToInterpolationCoefficients(c,z,Tolerance){
     }
   }
   //Cas particulier cf papiers
-  else if(ordre>1){
+  else if((opt.ordre == undefined & ordre>1) | opt.ordre>1){
     if (DataLength == 1){
         return
     }
