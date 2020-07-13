@@ -1,5 +1,5 @@
 var R = 0.15;//Control points radius
-var npt = 40;//Number of control points
+var npt = 20;//Number of control points
 var height = parseInt(0.8/0.8*npt*window.innerHeight/window.innerWidth/2)*2;//Height of the plot (Y amplitude)
 var width = parseInt(0.8/0.8*window.innerWidth);
 var dx = 0.04;//Step size for the plot
@@ -150,8 +150,18 @@ svg.setAttribute("viewBox","0 0 "+npt+" "+height);
 document.addEventListener('mouseup',function(){
   document.getElementById("measurements").innerHTML = ""
   if(dragging != -1){
+    switch (draggingSort) {
+      case "handle1":
+      case "handle2":
+        dragging.unselectHandle()
+        dragging.unselect()
+        break;
+      default:
+        dragging.unselectHandle()
+        dragging.unselect()
     try{dragginghelper.delete();}
     catch{}
+  }
   }
   dragging = -1;
   document.body.style.cursor=""
@@ -160,7 +170,7 @@ document.onmousemove = function(e){
   Xm = e.clientX;
   Ym = e.clientY;
   if(dragging != -1){
-    document.body.style.cursor="grab"
+    document.body.style.cursor="move"
     //Disjonction
     switch (draggingSort) {
       case "handle1":
@@ -195,12 +205,13 @@ document.onmousemove = function(e){
           dragging["theta"+currentHandle] =theta;
           dragging["l"+currentHandle] = dist;
         }
-        dragging.redraw();
+        dragging.selectHandle()
         Points.redraw();
         break;
       default:
       var y0 = Math.min(height,Math.max(0,ChangementRepere(0,Ym)[1]));
         dragging.moveY(y0)
+        dragging.select();
         if(MultiSpline!=0 && MultiSpline.indexOf("2D") != -1){
           dragging.moveX(Math.min(width,Math.max(0,ChangementRepere(Xm,0)[0])))
         }
@@ -221,7 +232,7 @@ document.addEventListener("touchmove",function(e){
   Xm = e.touches[0].clientX;
   Ym = e.touches[0].clientY;
   if(dragging != -1){
-            document.body.style.cursor="grab"
+            document.body.style.cursor="move"
     dragging.moveY(Math.min(height,Math.max(0,ChangementRepere(0,Ym)[1])))
     Points.redraw();
   }
@@ -288,17 +299,32 @@ class Point{
       dragginghelper.strokeWidth("0.05");
       dragginghelper.strokeDasharray('0.15 0.05')
       dragginghelper.redraw();
+      this.setAttribute('r', 3*R);
     })
 
     newNoeud.addEventListener('ondrag',function(){
+
+      this.select();
     })
 
     newNoeud.addEventListener('mouseover',function(){
-      document.body.style.cursor="pointer"
+      document.body.style.cursor="move"
+      Points.id(id).select();
+    })
+
+    newNoeud.addEventListener('mouseout',function(){
+
+      if(dragging == -1 | dragging !=-1 && dragging.id !=id){
+        Points.id(id).unselect();
+        document.body.style.cursor=""
+      }
+
+
     })
     this.x = x;
     this.y = y;
     this.id = id;
+    this.opacity = 1;
     this.r = R;
     this.hasHandle = false;
     this.groupHandles = true;
@@ -317,12 +343,15 @@ class Point{
     newBar.setAttribute('id',"BPoint_"+this.id);
     this.domG().prepend(newBar)
     var disth = 3/4;
+    this.opacityHandle = this.opacityHandle||1;
+
     //Groupes pour barres + handles
     var newGC1 = document.createElementNS('http://www.w3.org/2000/svg','g');
     newGC1.setAttribute('id','Handle1_'+this.id);
     newBar.appendChild(newGC1);
     var newGC2 = document.createElementNS('http://www.w3.org/2000/svg','g');
     newGC2.setAttribute('id','Handle2_'+this.id);
+
     newBar.appendChild(newGC2);
     //Barre transversale
     //à Gauche
@@ -347,7 +376,7 @@ class Point{
     newGC2.appendChild(newT2)
 
     //Handlers
-    var hsize = 3/2*R
+    var hsize = this.hsize||3/2*R;
     this.hsize = hsize;
     var newH1 = document.createElementNS('http://www.w3.org/2000/svg','rect');
     newH1.setAttribute('id',"RectHandle1_"+this.id);
@@ -362,6 +391,12 @@ class Point{
 
     var newH2 = document.createElementNS('http://www.w3.org/2000/svg','rect');
     newH2.setAttribute('id',"RectHandle2_"+this.id);
+    if(MultiSpline == "D S1+S2" | MultiSpline == "2D S1+S2"){
+      newH2.style.display = 'none';
+      if(MultiSpline == "D S1+S2"){
+        newGC2.style.display = "none"
+      }
+    }
     newH2.setAttribute("height",hsize)
     newH2.setAttribute("width",hsize)
     newH2.setAttribute("fill","url(#g2)")
@@ -387,21 +422,47 @@ class Point{
       var idt = this.getAttribute('id').split("_")[1];
       dragging = Points.id(idt);
       draggingSort = "handle1";
+
+      Points.id(idt).selectHandle()
+
     })
 
     newH2.addEventListener('mousedown',function(){
       var idt = this.getAttribute('id').split("_")[1];
       dragging = Points.id(idt);
       draggingSort = "handle2";
+      Points.id(idt).selectHandle()
+
     })
 
     newH1.addEventListener('mouseover',function(){
-      document.body.style.cursor="pointer"
+      document.body.style.cursor="move"
+      var idt = this.getAttribute('id').split("_")[1];
+      Points.id(idt).selectHandle()
+
     })
 
+    newH1.addEventListener('mouseout',function(){
+      document.body.style.cursor=""
+      var idt = this.getAttribute('id').split("_")[1];
+      if(dragging == -1 | dragging !=-1 && dragging.id !=idt){
+        Points.id(idt).unselectHandle()
+      }
 
+
+    })
     newH2.addEventListener('mouseover',function(){
-      document.body.style.cursor="pointer"
+      document.body.style.cursor="move"
+      var idt = this.getAttribute('id').split("_")[1];
+      Points.id(idt).selectHandle()
+
+    })
+    newH2.addEventListener('mouseout',function(){
+      document.body.style.cursor=""
+      var idt = this.getAttribute('id').split("_")[1];
+      if(dragging == -1 | dragging !=-1 && dragging.id !=idt){
+      Points.id(idt).unselectHandle()}
+
     })
     // newH1.addEventListener('mouseout',function(){
     //   document.body.style.cursor=""
@@ -410,6 +471,7 @@ class Point{
     //   document.body.style.cursor=""
     // })
   }
+
 
   removeHandles(){
     if(this.hasHandle){
@@ -454,11 +516,38 @@ class Point{
     return(document.getElementById("LinePoint2_"+this.id))
   }
 
+  select(){
+    this.opacity = 0.5;
+    this.r = 2*R;
+    this.redraw()
+  }
+
+  unselect(){
+    this.opacity = 1;
+    this.r = R;
+    this.redraw();
+  }
+
+  selectHandle(){
+    this.opacityHandle = 0.5;
+    this.hsize = 2*R;
+    this.redraw()
+  }
+
+  unselectHandle(){
+    console.log("unselect")
+    this.opacityHandle = 1;
+    this.hsize= 3/2*R;
+    this.redraw();
+  }
+
+
   redraw(){
     var pt = this.dom();
     pt.setAttribute('cx',0)
     pt.setAttribute('cy',0)
     pt.setAttribute('r',this.r)
+    pt.setAttribute('opacity',this.opacity)
     var Gpt = this.domG();
     Gpt.setAttribute('transform','translate('+this.x+','+this.y+')')
     if(MultiSpline == "D S2+S4"){
@@ -466,13 +555,40 @@ class Point{
     }
 
     if(this.hasHandle){
+      if(MultiSpline=="2D S1+S2"){
+        var idp = this.id-3
+        console.log(idp)
+        if(idp>-1){
+
+          var ps = Points.id(idp)
+          var xh = this.x+(this.l1-this.hsize/2)*Math.cos(this.theta1/180*Math.PI+Math.PI)
+          var yh = this.y+(this.l1-this.hsize/2)*Math.sin(this.theta1/180*Math.PI+Math.PI)
+          console.log(xh,yh,ps)
+          ps.l2 = Math.sqrt((xh-ps.x)**2+(yh-ps.y)**2)
+
+          ps.theta2 = Math.atan((yh-ps.y)/(xh-ps.x))/Math.PI*180
+          console.log(ps.l2)
+          if(xh-ps.x<0){
+            ps.theta2-=180;
+          }
+        }
+
+      }
       this.domB().setAttribute("transform","rotate("+this.theta+")")
       this.domH1().setAttribute("transform","rotate("+this.theta1+")")
       this.domH2().setAttribute("transform","rotate("+this.theta2+")")
       this.domL1().setAttribute("x1",-this.l1)
+      this.domRect1().setAttribute("height",this.hsize)
+      this.domRect2().setAttribute("height",this.hsize)
+      this.domRect1().setAttribute("width",this.hsize)
+      this.domRect2().setAttribute("width",this.hsize)
       this.domL2().setAttribute("x2",this.l2)
       this.domRect1().setAttribute("x",-this.l1)
       this.domRect2().setAttribute("x",this.l2-this.hsize)
+      this.domRect1().setAttribute("y",-this.hsize/2)
+      this.domRect2().setAttribute("y",-this.hsize/2)
+      this.domRect1().setAttribute('opacity',this.opacityHandle)
+      this.domRect2().setAttribute('opacity',this.opacityHandle)
     }
     //pt.setAttribute('cy',this.y)
     //pt.setAttribute('r',this.r)
@@ -795,14 +911,18 @@ class p{
     //
 
     this.dom().setAttribute('d',List2Path(xl,s));
-    // var ordreold = ordre;
-    // ordre = 3
-    // var MultiSplineold = MultiSpline
-    // MultiSpline = 0;
-    // var s = Fit(this.axis.val,ConvertToInterpolationCoefficients(this.posY(),poles[ordre],eps));
-    // this.dom2().setAttribute('d',List2Path(xl,s));
-    // ordre = ordreold;
-    // MultiSpline = MultiSplineold;
+    //Temp pour afficher deux courbes
+  //   if(MultiSpline!=0 && MultiSpline.indexOf("D")>-1){
+  //   var ordreold = ordre;
+  //   ordre = 2
+  //   var MultiSplineold = MultiSpline
+  //   MultiSpline = "D S4+S5";
+  //   //Points.addHandles();
+  //   var s = FitH1H2S4S5(this.axis.val,this.posY(),this.DY())
+  //   this.dom2().setAttribute('d',List2Path(xl,s));
+  //   ordre = ordreold;
+  //   MultiSpline = MultiSplineold;
+  // }
   }
 }
 
@@ -1138,10 +1258,10 @@ function FitDS1S2(x,c){
     var i0 = Math.floor(xi/N);
     valtoadd += (c[N*i0])*DS1S2_1(xi-i0*N)
     if(N*i0+3>c.length-1){
-      valtoadd += (c[N*i0+1])*DS1S2_2(xi-(i0+1)*N)
+      valtoadd += (c[N*i0+1]/2)*DS1S2_2(xi-(i0+1)*N)
     }
     else{
-      valtoadd += (c[N*i0+3])*DS1S2_2(xi-(i0+1)*N)
+      valtoadd += (c[N*i0+3]/2)*DS1S2_2(xi-(i0+1)*N)
     }
 
     if(N*i0+2>=c.length-1){
@@ -1391,10 +1511,10 @@ function FitS3S4(x,Y){
    }
 
    ordre = 2
-   console.log(C1,C2)
+
    C1 = ConvertToInterpolationCoefficients(C1,[4-Math.sqrt(15)],eps)
    C2 = ConvertToInterpolationCoefficients(C2,[4-Math.sqrt(15)],eps)
-   console.log(C1,C2)
+
    return(FitNFunction(x,[C1,C2],[[H1H2S3S4_1,4],[H1H2S3S4_2,4]]))
 
 }
@@ -1787,7 +1907,7 @@ document.getElementById("Languette").addEventListener("dragend",function(e){
 //Control buttons
 Array.from(document.getElementsByClassName("control")).forEach(function(element) {
   element.addEventListener('click', function(){
-    console.log(element)
+
     switch (element.id) {
       case "showControlPoints":
         if(element.getAttribute("visible")=="true"){
