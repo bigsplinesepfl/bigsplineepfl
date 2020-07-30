@@ -1,8 +1,12 @@
+
+//////////////////////////////////
+/// Genral parameters ///////////
+/////////////////////////////////
 var R = 0.15;//Control points radius
-var npt = 20;//Number of control points
+var npt = 30;//Number of control points
 var height = parseInt(0.8/0.8*npt*window.innerHeight/window.innerWidth/2)*2;//Height of the plot (Y amplitude)
 var width = parseInt(0.8/0.8*window.innerWidth);
-var dx = 0.04;//Step size for the plot
+var dx = 0.04;//Step size for the lines plotted
 var Points = [];//List of Control points
 var Xm = 0;//Mouse X position
 var Ym = 0;//Mouse Y position
@@ -47,7 +51,6 @@ document.getElementById("SelectOrder").addEventListener("change",function(){
   document.getElementById("nroot").innerHTML = this.options[this.selectedIndex].getAttribute('nroot')||''
   Points.redraw();
 })
-
 
 document.getElementById("PredefinedCurves").addEventListener("change",function(){
   c = new curve();
@@ -145,7 +148,7 @@ document.getElementById("PredefinedCurves").addEventListener("change",function()
 
 var svg = document.getElementById("svg");
 //viewBox
- svg.setAttribute('viewBox',"0 0 " + height+" "+height);
+svg.setAttribute('viewBox',"0 0 " + height+" "+height);
 svg.setAttribute("viewBox","0 0 "+npt+" "+height);
 document.addEventListener('mouseup',function(){
   document.getElementById("measurements").innerHTML = ""
@@ -238,29 +241,6 @@ document.addEventListener("touchmove",function(e){
   }
 })
 
-Ph = function(toto){
-  function draggable(){
-    // toto.dom().addEventListener('mousedown',function(){
-    //
-
-
-
-  }
-}
-
-//   var myClick = function( click_count,elt) {
-//     var handler = function(event) {
-//         click_count++;
-
-//         if(click_count == 5) {
-//            // to remove
-//            elt.removeEventListener('click', handler);
-//         }
-//     };
-//     return handler;
-// };
-
-// to add
 
 class Point{
   constructor(x=0.0, y=height/2,id=0){
@@ -472,7 +452,6 @@ class Point{
     // })
   }
 
-
   removeHandles(){
     if(this.hasHandle){
       this.domB().remove()
@@ -625,7 +604,6 @@ class p{
     this.val.push(Point)
   }
 
-
   length(){
     return(this.val.length)
   }
@@ -643,6 +621,7 @@ class p{
     }
     this.val[i0].show()
   }
+
   id(n){
     for(var elt of this.val){
       if(elt.id == n){
@@ -766,6 +745,7 @@ class p{
     }
     return(ans)
   }
+
   //Liste des posY et derivee pour interpolation derivee
   posYDY(){
     var ans = [];
@@ -830,6 +810,7 @@ class p{
   col(col){
     this.dom().setAttribute('stroke',col)
   }
+
   redraw(){
     tini = performance.now()
     Points.removeHandles();
@@ -935,6 +916,7 @@ for(var i = 0;i<Ll[0].length;i++){
 }
 return(ans)
 }
+
 class curve{
   constructor(id = IdCurve){
 
