@@ -212,7 +212,7 @@ document.onmousemove = function(e){
         Points.redraw();
         break;
       default:
-      var y0 = Math.min(height,Math.max(0,ChangementRepere(0,Ym)[1]));
+      var y0 = Math.min(height,Math.max(0.0001,ChangementRepere(0,Ym)[1]));
         dragging.moveY(y0)
         dragging.select();
         if(MultiSpline!=0 && MultiSpline.indexOf("2D") != -1){
@@ -1871,6 +1871,7 @@ document.getElementById("SelectOrder").dispatchEvent(event);
 document.getElementById("Languette").addEventListener("drag",function(e){
   if(e.clientX>100){
     document.getElementById("leftpane").style.width = Math.min(Math.max(e.clientX,220),window.innerWidth-10)
+    
   }
 })
 

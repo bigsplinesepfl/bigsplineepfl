@@ -47,7 +47,7 @@ body{
   border: 2px solid black;
   border-right-width: 0px;
   box-shadow: inset -3px 0px 0 1px black;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 #svg{
