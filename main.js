@@ -4,7 +4,7 @@
 /////////////////////////////////
 var R = 0.15;//Control points radius
 var npt = 30;//Number of control points
-var height = parseInt(0.8/0.8*npt*window.innerHeight/window.innerWidth/2)*2;//Height of the plot (Y amplitude)
+var height = parseInt(0.8/0.8*(npt)*window.innerHeight/window.innerWidth/2)*2;//Height of the plot (Y amplitude)
 var width = parseInt(0.8/0.8*window.innerWidth);
 var dx = 0.04;//Step size for the lines plotted
 var Points = [];//List of Control points
@@ -28,6 +28,15 @@ var dragging = -1;//COntrole point currently being dragged
 var draggingSort = ""; //Dragging control point, handlers...
 var dragginghelper = -1;
 
+
+A = new accordion([{text:'Interpolation of f(k) in',next:[{text:'in S0'},{text:'in S1'},{text:'in S1+S2'},{text:'in S2'},{text:'in S3'},{text:'in S4'},{text:'in S5'},{text:'in S6'},{text:'in S7'}]},{text:'Interpolation of f(k) & f\'(k)',next:[{text:'in 1D'},{text:'in 2D',next:[{text:'in S1+S2',next:[{text:'2211'},{text:'2212',click:()=>alert("toto"),next:[]}]}]}]}])
+
+A.dom().style.zIndex = "2";
+A.dom().style.position= "absolute";
+document.getElementById("leftpane").parentNode.insertBefore(A.dom(), document.getElementById("leftpane"));
+document.getElementById("leftpane").style.left = A.width()
+
+document.getElementById("svg").style.width =  "calc(100% - "+(220+A.width())+"px)";
 //Select the order of B-Splines
 document.getElementById("SelectOrder").addEventListener("change",function(){
   var txt = this.options[this.selectedIndex].getAttribute('order');
@@ -149,7 +158,7 @@ document.getElementById("PredefinedCurves").addEventListener("change",function()
 var svg = document.getElementById("svg");
 //viewBox
 svg.setAttribute('viewBox',"0 0 " + height+" "+height);
-svg.setAttribute("viewBox","0 0 "+npt+" "+height);
+svg.setAttribute("viewBox","0 0 "+(npt-1)+" "+height);
 document.addEventListener('mouseup',function(){
   document.getElementById("measurements").innerHTML = ""
   if(dragging != -1){
@@ -1869,9 +1878,9 @@ var event = new Event('change');
 document.getElementById("SelectOrder").dispatchEvent(event);
 
 document.getElementById("Languette").addEventListener("drag",function(e){
-  if(e.clientX>100){
-    document.getElementById("leftpane").style.width = Math.min(Math.max(e.clientX,220),window.innerWidth-10)
-    
+  if((e.clientX-A.width())>100){
+    document.getElementById("leftpane").style.width = Math.min(Math.max(e.clientX-A.width(),220),window.innerWidth-10)
+
   }
 })
 

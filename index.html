@@ -4,10 +4,11 @@
 <link rel="stylesheet" type="text/css" href="style.css"/>
 </head>
   <body style="height:100%;margin:0px;overflow:hidden" encoding="utf-8" >
+    <a id="BIGLink" href="http://bigwww.epfl.ch/" target="_blank">Biomedical Imaging Group EPFL</a>
     <div style="height:100%;">
       <div style="width:100%;font-size:20px;z-index: 10;position: relative; ">
-        <div style="margin:0px;font-size:30px;color:white;background: linear-gradient(#1b7b1f,#125816);margin-top: 2px;padding: 4px;width: 100%;text-align:center;border: 0.3px solid black;">
- Multispline Interpolation Demo<br>
+        <div style="margin:0px;font-size:30px;color:white;background: linear-gradient(#1b7b1f,#125816);margin-top: 0px;padding: 4px;width: 100%;text-align:center;border: 0.3px solid black;">
+Generalized Sampling with Shortest Multispline Bases<br>
           <div style="width: 100%;position: absolute;border: 0.5px solid white;"></div>
           <span style="font-size:20px"> Reconstruction space</span>
           <select id="SelectOrder">
@@ -25,14 +26,12 @@
               <option order="6" nroot="6" col="purple" interpolationof="$f(k)$" interpolationwith="$beta6$">S6 (#7)</option>
             </optgroup>
             <optgroup label ="Value and derivative">
-                            <option nroot="0" order="D S1+S2" col="purple" interpolationof="$f(k)$ | $f'(k)$" interpolationwith="$beta1$ | $beta2$">D S1+S2(#)</option>
+              <option nroot="0" order="D S1+S2" col="purple" interpolationof="$f(k)$ | $f'(k)$" interpolationwith="$beta1$ | $beta2$">D S1+S2(#)</option>
               <option nroot="0" order="D S2+S3" img="D S2+S3.svg" col="purple" interpolationof="$f(k)$ | $f'(k)$" interpolationwith="$beta2$ | $beta3$">D S2+S3(#)</option>
               <option nroot="2" order="D S4+S5" img="D S4+S5.svg" col="purple" interpolationof="$f(k)$ | $f'(k)$" interpolationwith="$beta4$ | $beta5$">*D S4+S5(#)</option>
               <option nroot="0" order="D S1+S2+S3" img="D S1+S2+S3.svg" col="purple" interpolationof="$f(k)$ | $f'(k)$ right and left" interpolationwith="$beta1$ | $beta2$ | $beta3$">D S1+S2+S3(#)</option>
               <option nroot="2" order="D S2+S4" img="D S2+S4.svg" col="purple" interpolationof="$f(k+1|2)$ | $f'(k)$" interpolationwith="$beta2$ | $beta4$">*D S2+S4(#)</option>
-
             </optgroup>
-
             <optgroup label="Value and second derivative">
               <option order="D2 S3+S5" img="D S3+S5.svg" col="purple" interpolationof="$f(k)$ | $f''(k)$" interpolationwith="$beta3$ | $beta5$">*D2 S3+S5(#)</option>
               <option order="D2 S3+S4" img="D2 S3+S4.svg" comment="The filter is unstable in others cases:<br> f(k),f'(k) <br> f(k),f'(k+1/2) <br>f(k),f''(k)<br> ..." col="purple" interpolationof="$f(k)$ | $f''(k+1|2)$" interpolationwith="$beta3$ | $beta4$">*D2 S3+S4(#)</option>
@@ -118,7 +117,9 @@
   <!-- <script>
     var cl = new cle("console");
     </script> -->
+    <script src="accordion.js"></script>
     <script src="main.js"></script>
+
 
 
 </html>
