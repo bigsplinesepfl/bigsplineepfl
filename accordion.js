@@ -52,7 +52,7 @@ class accordion{
             lit.appendChild(arrow)
           }
           var graycol = (1-(Math.exp(-rownum/2)))*255;
-          lit.style.cssText = "cursor:pointer;background:rgb("+graycol+","+graycol+","+graycol+");padding:"+(Math.exp(-rownum/2)*10)+"px;border-bottom:0px solid white;color:white;list-type:none"
+          lit.style.cssText = "cursor:pointer;background:rgb("+graycol+","+graycol+","+graycol+");padding:"+(Math.exp(-rownum/2)*10)+"px;border-bottom:0px solid white;color:white;list-type:none;"
           a.style.cssText = "padding-left:"+2*rownum+"em;padding-right:5px;"
           arrow.style.float = "right";
           arrow.style.transform = "translateY(-2px)scale(1.5)";
@@ -104,7 +104,7 @@ class accordion{
     this.container.style.cssText = "display:inline-flex;background:black;height:100%";
     this.containerUl = document.createElement('ul');
     this.container.appendChild(this.containerUl)
-    this.containerUl.style.cssText = "margin:0px;background:black;height:100%;padding:0px"
+    this.containerUl.style.cssText = "margin:0px;background:#14661b;height:100%;padding:0px"
     this.containerUl.appendChild(addsublevelRec(this.containerUl,data,0));
     //document.body.appendChild(this.container)
 
