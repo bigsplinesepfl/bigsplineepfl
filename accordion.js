@@ -132,4 +132,36 @@ class accordion{
 
 }
 
+class helperview{
+  constructor(){
+    this.Dom = document.createElement('div');
+    this.Dom.classList.add("herlperview0");
+    var div2 = document.createElement('div');
+    div2.classList.add("herlperview1");
+    this.Dom.appendChild(div2);
+    this.Dom.obj = this;
+    this.Dom.addEventListener('click',function(){
+      document.body.removeChild(this)
+    })
+
+
+    var Rect = document.getElementById("svg").getBoundingClientRect();
+    this.h1 = document.createElement('img');
+    this.h1.src = "./images/helper1.png";
+    this.Dom.appendChild(this.h1);
+    this.h1.style.cssText = "transform:translate(-50%,-120%);top:"+(Rect.y+Rect.height/2)+";left:"+(Rect.x+Rect.width/2)+";height:150px;position:absolute;"
+
+    this.h2 = document.createElement('img');
+    this.h2.src = "./images/helper2.png";
+    this.Dom.appendChild(this.h2);
+    console.log(A.width())
+    this.h2.style.cssText = "transform:translate(3%,40%);top:"+(Rect.y)+";left:"+(A.width())+";height:150px;position:absolute;"
+
+    document.body.appendChild(this.Dom);
+
+  }
+}
+
+
+
 //A = new accordion([{text:'Interpolation of f\'(k)',next:[{text:'in S0'},{text:'in S1',next:[]}]},{text:'Interpolation of f(k) and f`(k)',next:[{text:'in 1D'},{text:'in 2D',next:[{text:'in S1+S2',next:[{text:'2211'},{text:'2212',click:()=>alert("toto"),next:[]}]}]}]}])

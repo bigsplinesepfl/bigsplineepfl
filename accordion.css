@@ -57,3 +57,25 @@
 .accordionsublevelul_1 li:hover>a{
   color:#1bd61b;
 }
+
+
+
+
+.herlperview0{
+  height:100%;
+  width:100%;
+  position: absolute;
+  z-index: 10000;
+  top:0px;
+  left:0px;
+}
+
+.herlperview1{
+  height:100%;
+  width:100%;
+  position: absolute;
+  background: white;
+  opacity:0.6;
+  top:0px;
+  left:0px;
+}

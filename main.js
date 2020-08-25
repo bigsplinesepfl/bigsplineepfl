@@ -36,6 +36,7 @@ function switchorder(order){
   }
   return(ans)
 }
+var A0 = {text:'Theory',click:function(){alert("Section not ready ! Please navigate elsewhere.")}}
 var A11 = [{text:'in S0',click:switchorder(0)},{text:'in S1',click:switchorder(1)},{text:'in S2',click:switchorder(2)},{text:'in S3',click:switchorder(3)},{text:'in S4',click:switchorder(4)},{text:'in S5',click:switchorder(5)},{text:'in S6',click:switchorder(6)}]
 var A12 = [{text:'in S1+S2',click:switchorder("1+2")},{text:'in S3+S4',click:switchorder("3+4")}];
 var A13 = [{text:'in S1+S2+S3',click:switchorder("1+2+3")}]
@@ -46,7 +47,9 @@ var B2 = [{text:'in S1+S2 <span style=\'font-style:italic;color:#00ff00;font-siz
 var A2 = {text:'Interpolation of f(k) and f\'(k)',next:[{text:'1D',next:B1},{text:'2D',next:B2}]}
 
 
-A = new accordion([A1,A2])
+A = new accordion([A0,A1,A2])
+
+setTimeout(function(){H = new helperview()},100)
 
 A.dom().style.zIndex = "2";
 A.dom().style.position= "absolute";
@@ -54,9 +57,10 @@ document.getElementById("leftpane").parentNode.insertBefore(A.dom(), document.ge
 document.getElementById("leftpane").style.left = A.width()
 
 document.getElementById("svg").style.width =  "calc(100% - "+(220+A.width())+"px)";
+document.getElementById("controlpane").style.width =  "calc(100% - "+(220+A.width())+"px)";
 //Select the order of B-Splines
 document.getElementById("SelectOrder").addEventListener("change",function(){
-  var space = this.value.split("#").join("").split("()").join("").split(")").join("").split("2D2").join("").split("2D").join("").split("D2").join("")
+  var space = this.value.split("(")[0].split("*").join("").split("#").join("").split("()").join("").split(")").join("").split("2D2").join("").split("2D").join("").split("D2").join("").split("D").join("");
   document.getElementById("reconstructionspace").textContent = "Reconstruction space: "+space;
   var txt = this.options[this.selectedIndex].getAttribute('order');
   var Ngenerators = txt.split("+").length;
