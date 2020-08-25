@@ -1,7 +1,9 @@
 class accordion{
-  constructor(data,name){
+  constructor(data,opt){
+    opt = opt || {};
     //Main contaimer
-    name = name || Math.floor(100000*Math.random())
+    opt.name = opt.name || Math.floor(100000*Math.random());
+    opt.oneatthetime = opt.oneatthetime || false;
     this.name = name;
     function hidenext(item,chvisi){
       if(item != undefined){
@@ -27,6 +29,7 @@ class accordion{
 
       }
     }
+    this.opt = opt;
     function addsublevelRec(parent,data,rownum){
 
       var elt = document.createElement('ul')
@@ -50,18 +53,20 @@ class accordion{
           lit.appendChild(a)
           var arrow = document.createElement('span');
           arrow.innerHTML = "›";
-          a.textContent = toto.text;
+          a.innerHTML = toto.text;
           arrow.style.fontFamily = "serif";
           lit.arrow = arrow;
           if(!(toto.next == undefined || toto.next.length == 0)){
 
             lit.appendChild(arrow)
           }
-          var graycol = (1-(Math.exp(-rownum/2)))*255;
+          var graycol = (1-(Math.exp(-rownum/3)))*255;
           lit.style.cssText = "cursor:pointer;background:rgb("+graycol+","+graycol+","+graycol+");padding:"+(Math.exp(-rownum/2)*10)+"px;border-bottom:0px solid white;color:white;list-type:none;"
-          a.style.cssText = "padding-left:"+2*rownum+"em;padding-right:5px;"
-          arrow.style.float = "right";
-          arrow.style.transform = "translateY(-2px)scale(1.5)";
+          a.style.cssText = "padding-left:"+1.2*rownum+"em;padding-right:5px;"
+          arrow.style.position = "absolute";
+          arrow.style.right = "8px";
+          arrow.style.transform = "scale(1.5)";
+          arrow.style.transformOrigin = "right center";
 
           if(toto.click != undefined){
             lit.addEventListener('click',toto.click)
@@ -69,16 +74,13 @@ class accordion{
 
           if(toto.next != undefined){
             lit.childrenvisible = false;
-            lit.addEventListener('mouseover',function(){
-              //document.body.style.cursor = "pointer"
-            })
             lit.addEventListener('click',function(){
 
               var childList = Array.from(this.next.children)
               this.childrenvisible = !this.childrenvisible
 
               var chvisi = this.childrenvisible
-              this.arrow.style.transform = chvisi?"rotate(90deg)translateY(-2px)scale(1.5)":"translateY(-2px)scale(1.5)";
+              this.arrow.style.transform = chvisi?"rotate(90deg)translateX(5px)scale(1.5)":"scale(1.5)";
               var item = this.next;
               hidenext(this.next,chvisi)
               // childList.forEach(function(item){

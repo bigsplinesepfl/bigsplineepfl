@@ -36,8 +36,17 @@ function switchorder(order){
   }
   return(ans)
 }
+var A11 = [{text:'in S0',click:switchorder(0)},{text:'in S1',click:switchorder(1)},{text:'in S2',click:switchorder(2)},{text:'in S3',click:switchorder(3)},{text:'in S4',click:switchorder(4)},{text:'in S5',click:switchorder(5)},{text:'in S6',click:switchorder(6)}]
+var A12 = [{text:'in S1+S2',click:switchorder("1+2")},{text:'in S3+S4',click:switchorder("3+4")}];
+var A13 = [{text:'in S1+S2+S3',click:switchorder("1+2+3")}]
+var A14 = [{text:'in S1+S2+S3+S4',click:switchorder("1+2+3+4")}]
+var A1 = {text:'Interpolation of f(k)',next:[{text:'mono-spline',next:A11},{text:'bi-splines',next:A12},{text:'tri-splines',next:A13},{text:'quadri-splines',next:A14}]};
+var B1 = [{text:'in S1+S2 <span style=\'font-style:italic;color:#00ff00;font-size:14px\'>quadratic Bézier</span>',click: switchorder("D S1+S2")},{text:'in S2+S3 <span style=\'font-style:italic;color:#00ff00;font-size:14px\'>bicubic Hermite splines</span>',click: switchorder("D S2+S3")},{text:'in S4+S5 <span style=\'font-style:italic;color:#00ff00;font-size:14px\'>biquintic Hermite splines</span>',click: switchorder("D S4+S5")},{text:'in S2+S4 <span style=\'font-style:italic;color:#00ff00;font-size:14px\'>non consecutive</span>',click: switchorder("D S2+S4")},{text:'in S1+S2+S3 <span style=\'font-style:italic;color:#00ff00;font-size:14px\'>cubic Bézier</span>',click: switchorder("D S1+S2+S3")}]
+var B2 = [{text:'in S1+S2 <span style=\'font-style:italic;color:#00ff00;font-size:14px\'>quadratic Bézier</span>',click: switchorder("2D S1+S2")},{text:'in S1+S2+S3 <span style=\'font-style:italic;color:#00ff00;font-size:14px\'>cubic Bézier</span>',click: switchorder("2D S1+S2+S3")}];
+var A2 = {text:'Interpolation of f(k) and f\'(k)',next:[{text:'1D',next:B1},{text:'2D',next:B2}]}
 
-A = new accordion([{text:'Interpolation of f(k) in',next:[{text:'in S0',click:switchorder(0)},{text:'in S1',click:switchorder(1)},{text:'in S1+S2',click:switchorder("1+2")},{text:'in S2',click:switchorder(2)},{text:'in S3',click:switchorder(3)},{text:'in S4',click:switchorder(4)},{text:'in S5',click:switchorder(5)},{text:'in S6',click:switchorder(6)},{text:'in S7',click:switchorder(7)}]},{text:'Interpolation of f(k) & f\'(k)',next:[{text:'in 1D'},{text:'in 2D',next:[{text:'in S1+S2',next:[{text:'2211'},{text:'2212',click:()=>alert("toto"),next:[]}]}]}]}])
+
+A = new accordion([A1,A2])
 
 A.dom().style.zIndex = "2";
 A.dom().style.position= "absolute";
@@ -47,6 +56,8 @@ document.getElementById("leftpane").style.left = A.width()
 document.getElementById("svg").style.width =  "calc(100% - "+(220+A.width())+"px)";
 //Select the order of B-Splines
 document.getElementById("SelectOrder").addEventListener("change",function(){
+  var space = this.value.split("#").join("").split("()").join("").split(")").join("").split("2D2").join("").split("2D").join("").split("D2").join("")
+  document.getElementById("reconstructionspace").textContent = "Reconstruction space: "+space;
   var txt = this.options[this.selectedIndex].getAttribute('order');
   var Ngenerators = txt.split("+").length;
   G.dx = Ngenerators;
