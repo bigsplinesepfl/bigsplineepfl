@@ -36,7 +36,7 @@ window.mobileCheck = function() {
 };
 
 if(window.mobileCheck()){
-  alert("This website is not suited for this device (any mobile device)")
+  alert("This website was not designed for mobile devices. You should rather visit it with a computer.")
 }
 function switchorder(order){
   var ans = function(){
@@ -87,7 +87,6 @@ document.getElementById("SelectOrder").addEventListener("change",function(){
 
   document.getElementById("interpolationof").innerHTML = Latex(this.options[this.selectedIndex].getAttribute('interpolationof')||'');
   document.getElementById("interpolationwith").innerHTML = Latex(this.options[this.selectedIndex].getAttribute('interpolationwith')||'');
-  console.log("<img src=\"./images/"+(this.options[this.selectedIndex].getAttribute('img')||'')+"\">")
   document.getElementById("imggeneratingfunction").innerHTML = "<img style=\"border-radius:2px;width:calc(100% - 28px);border:2px solid gray\" src=\"./images/"+(this.options[this.selectedIndex].getAttribute('img')||'blank.svg')+"\">"
   document.getElementById("comment").innerHTML = this.options[this.selectedIndex].getAttribute('comment')||''
   document.getElementById("nroot").innerHTML = this.options[this.selectedIndex].getAttribute('nroot')||''
@@ -556,7 +555,6 @@ class Point{
   }
 
   unselectHandle(){
-    console.log("unselect")
     this.opacityHandle = 1;
     this.hsize= 3/2*R;
     this.redraw();
@@ -578,17 +576,14 @@ class Point{
     if(this.hasHandle){
       if(MultiSpline=="2D S1+S2"){
         var idp = this.id-3
-        console.log(idp)
         if(idp>-1){
 
           var ps = Points.id(idp)
           var xh = this.x+(this.l1-this.hsize/2)*Math.cos(this.theta1/180*Math.PI+Math.PI)
           var yh = this.y+(this.l1-this.hsize/2)*Math.sin(this.theta1/180*Math.PI+Math.PI)
-          console.log(xh,yh,ps)
           ps.l2 = Math.sqrt((xh-ps.x)**2+(yh-ps.y)**2)
 
           ps.theta2 = Math.atan((yh-ps.y)/(xh-ps.x))/Math.PI*180
-          console.log(ps.l2)
           if(xh-ps.x<0){
             ps.theta2-=180;
           }
@@ -670,7 +665,6 @@ class p{
         return(elt)
       }
     }
-    console.warn("Aucun point avec l'id "+n+" n'a été trouvé !")
     return(null)
   }
 
@@ -853,17 +847,25 @@ class p{
     this.dom().setAttribute('stroke',col)
   }
 
+  replace(){
+    for(var i = 0;i<npt;i++){
+      this.val[i].moveX(i)
+
+    }
+  }
   redraw(){
     tini = performance.now()
     Points.removeHandles();
     var xl = this.axis.val;
     //Coeffs
     if(MultiSpline == ""){
+      Points.replace();
       var s = Fit(this.axis.val,ConvertToInterpolationCoefficients(this.posY(),poles[ordre],eps));
     }
     else{
 
       if(MultiSpline.indexOf("D") == -1){
+        Points.replace()
         if(MultiSpline == "3+4"){
           var s = FitS3S4(this.axis.val,this.posY())
           //var s = FitHermite(this.axis.val,this.posYDY());
@@ -889,6 +891,7 @@ class p{
       var xl = FitDS1S2(this.axis.val,intercal([this.posX2D(),this.DX_l2D()]));
       }
       else{
+        Points.replace()
         if(MultiSpline == "D S4+S5"){
           Points.addHandles();
           var s = FitH1H2S4S5(this.axis.val,this.posY(),this.DY())
