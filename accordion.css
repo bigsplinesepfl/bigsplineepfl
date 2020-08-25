@@ -23,13 +23,13 @@
 
 
 .accordioncontainer ul{
-  max-height:1000px;
+  max-height:10000px;
   /* visibility:visible; */
   transition: max-height 0.4s ease-in;
 }
 
 .accordioncontainer ul li{
-  max-height:1000px;
+  max-height:10000px;
   opacity:1;
   transition-delay:0.4s;
   transition: opacity 0.2s ease-in;
