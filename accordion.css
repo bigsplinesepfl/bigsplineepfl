@@ -1,0 +1,55 @@
+.accordioncontainer{
+  display:inline-flex;
+  background:black;
+  height:100%;
+}
+
+.accordioncontainer li:hover>a{
+  color:#1bd61b;
+}
+
+.accordioncontainer .hiddenitem{
+  max-height: 0px;
+  visibility:hidden;
+  transition: max-height 1s ease-out;
+}
+
+.accordioncontainer .hiddenitem li{
+  max-height: 0px;
+  transition: max-height 1s ease-out;
+}
+
+
+.accordioncontainer ul{
+  max-height:1000px;
+  /* visibility:visible; */
+  transition: max-height 1s ease-in;
+}
+
+.accordioncontainer ul li{
+  max-height:1000px;
+  transition: max-height 1s ease-in;
+}
+
+.accordioncontainerul{
+  margin:0px;
+  background:#14661b;
+  height:100%;
+  padding:0px
+}
+
+
+
+.accordionsublevelul{
+  list-type: none;
+  padding-left:0;
+  /* transition: height ease-out 0.3s; */
+}
+
+.accordionsublevelul_1{
+  margin-bottom:5px;
+}
+
+.accordionsublevelul_1 li:hover>a{
+  color:#1bd61b;
+}

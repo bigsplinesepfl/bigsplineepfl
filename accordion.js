@@ -1,16 +1,19 @@
 class accordion{
-  constructor(data){
+  constructor(data,name){
     //Main contaimer
-
+    name = name || Math.floor(100000*Math.random())
+    this.name = name;
     function hidenext(item,chvisi){
       if(item != undefined){
         if(chvisi){
-          item.style.height = "auto"
-          item.style.visibility = "visible"
+          // item.style.height = "auto"
+          // item.style.visibility = "visible"
+          item.classList.remove("hiddenitem");
         }
         else{
-          item.style.height = "0px"
-          item.style.visibility = "hidden"
+          // item.style.height = "0px"
+          // item.style.visibility = "hidden"
+          item.classList.add("hiddenitem");
         }
         if(!chvisi){
           Array.from(item.children).forEach((iteme) => {
@@ -27,12 +30,15 @@ class accordion{
     function addsublevelRec(parent,data,rownum){
 
       var elt = document.createElement('ul')
-      elt.style.listType = "none";
-      elt.style.paddingLeft = "0";
-      elt.style.transition= "height ease-out 0.3s";
+      elt.classList.add("accordionsublevelul");
+      elt.classList.add("accordionsublevelul_"+rownum);
+      // elt.style.listType = "none";
+      // elt.style.paddingLeft = "0";
+      // elt.style.transition= "height ease-out 0.3s";
       if(rownum>0){
-        elt.style.visibility = "hidden";
-        elt.style.height = "0px";
+        elt.classList.add("hiddenitem")
+        // elt.style.visibility = "hidden";
+        // elt.style.height = "0px";
       }
 
       if(data != undefined){
@@ -101,10 +107,13 @@ class accordion{
     }
 
     this.container = document.createElement('div');
-    this.container.style.cssText = "display:inline-flex;background:black;height:100%";
+    this.container.id = "accordioncontainer_"+name;
+    this.container.classList.add("accordioncontainer");
+    //this.container.style.cssText = "display:inline-flex;background:black;height:100%";
     this.containerUl = document.createElement('ul');
-    this.container.appendChild(this.containerUl)
-    this.containerUl.style.cssText = "margin:0px;background:#14661b;height:100%;padding:0px"
+    this.containerUl.classList.add("accordioncontainerul");
+    this.container.appendChild(this.containerUl);
+    //this.containerUl.style.cssText = "margin:0px;background:#14661b;height:100%;padding:0px"
     this.containerUl.appendChild(addsublevelRec(this.containerUl,data,0));
     //document.body.appendChild(this.container)
 

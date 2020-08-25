@@ -28,8 +28,16 @@ var dragging = -1;//COntrole point currently being dragged
 var draggingSort = ""; //Dragging control point, handlers...
 var dragginghelper = -1;
 
+function switchorder(order){
+  var ans = function(){
+    document.getElementById("SelectOrder").value = document.querySelector('option[order=\''+order+'\']').value
+    var event = new Event('change');
+    document.getElementById("SelectOrder").dispatchEvent(event);
+  }
+  return(ans)
+}
 
-A = new accordion([{text:'Interpolation of f(k) in',next:[{text:'in S0'},{text:'in S1'},{text:'in S1+S2'},{text:'in S2'},{text:'in S3'},{text:'in S4'},{text:'in S5'},{text:'in S6'},{text:'in S7'}]},{text:'Interpolation of f(k) & f\'(k)',next:[{text:'in 1D'},{text:'in 2D',next:[{text:'in S1+S2',next:[{text:'2211'},{text:'2212',click:()=>alert("toto"),next:[]}]}]}]}])
+A = new accordion([{text:'Interpolation of f(k) in',next:[{text:'in S0',click:switchorder(0)},{text:'in S1',click:switchorder(1)},{text:'in S1+S2',click:switchorder("1+2")},{text:'in S2',click:switchorder(2)},{text:'in S3',click:switchorder(3)},{text:'in S4',click:switchorder(4)},{text:'in S5',click:switchorder(5)},{text:'in S6',click:switchorder(6)},{text:'in S7',click:switchorder(7)}]},{text:'Interpolation of f(k) & f\'(k)',next:[{text:'in 1D'},{text:'in 2D',next:[{text:'in S1+S2',next:[{text:'2211'},{text:'2212',click:()=>alert("toto"),next:[]}]}]}]}])
 
 A.dom().style.zIndex = "2";
 A.dom().style.position= "absolute";
