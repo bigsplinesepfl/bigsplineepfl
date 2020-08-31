@@ -14,20 +14,20 @@ Generalized Sampling with Shortest Multispline Bases<br>
           <span id="reconstructionspace" style="font-size:20px;display:block;padding:5px"> Reconstruction space</span>
           <select id="SelectOrder" style="display:none">
             <optgroup label ="Value">
-              <option order="0" roots="" nroot="0" col="blue" interpolationof="$f(k)$" interpolationwith="$beta0$">S0 (#1)</option>
-              <option order="1" roots="" nroot="0" col="green" interpolationof="$f(k)$" interpolationwith="$beta1$">S1 (#2)</option>
+              <option order="0"  img="S0.svg" roots="" nroot="0" col="blue" interpolationof="$f(k)$" interpolationwith="$beta0$">S0 (#1)</option>
+              <option order="1" img="S1.svg" roots="" nroot="0" col="green" interpolationof="$f(k)$" interpolationwith="$beta1$">S1 (#2)</option>
               <option order="1+2" roots="" nroot="0" img="S1+S2.svg" col="purple" interpolationof="$f(k|2)$" interpolationwith="$beta1$  | $beta2$">S1+S2 (#3)</option>
-              <option order="2" roots="0.17" nroot="2" col="red" interpolationof="$f(k)$" interpolationwith="$beta2$">S2 (#3)</option>
-              <option order="3" roots="0.27" nroot="2" col="purple" interpolationof="$f(k)$" interpolationwith="$beta3$">S3 (#4)</option>
+              <option order="2" img="S2.svg" roots="0.17" nroot="2" col="red" interpolationof="$f(k)$" interpolationwith="$beta2$">S2 (#3)</option>
+              <option order="3" img="S3.svg" roots="0.27" nroot="2" col="purple" interpolationof="$f(k)$" interpolationwith="$beta3$">S3 (#4)</option>
               <option order="1+2+3" roots="" nroot="0" img="S1+S2+S3.svg" interpolationof="$f(k|3)$" interpolationwith="$beta1$ | $beta2$ | $beta3$" col="purple">S1+S2+S3 (#4)</option>
-              <option order="4" nroot="4" col="yellow" interpolationof="$f(k)$" interpolationwith="$beta4$">S4 (#5)</option>
+              <option order="4" img="S4.svg" nroot="4" col="yellow" interpolationof="$f(k)$" interpolationwith="$beta4$">S4 (#5)</option>
               <option order="3+4" roots="0.13" nroot="2" img="D2 S3+S4.svg" col="purple" interpolationof="$f(k|2)$" interpolationwith="$beta3$ and $beta4$">*S3+S4 (#5)</option>
               <option order="1+2+3+4" roots="0.36,0.01" nroot="1" img="S1+S2+S3+S4.svg" col="purple" interpolationof="$f(k|4)$" interpolationwith="$beta1$ | $beta2$ | $beta3$ | $beta4$">S1+S2+S3+S4 (#5)</option>
-              <option order="5" nroot="4" col="red" interpolationof="$f(k)$" interpolationwith="$beta5$">S5 (#6)</option>
-              <option order="6" nroot="6" col="purple" interpolationof="$f(k)$" interpolationwith="$beta6$">S6 (#7)</option>
+              <option order="5" img="S5.svg" nroot="4" col="red" interpolationof="$f(k)$" interpolationwith="$beta5$">S5 (#6)</option>
+              <option order="6" img="S6.svg" nroot="6" col="purple" interpolationof="$f(k)$" interpolationwith="$beta6$">S6 (#7)</option>
             </optgroup>
             <optgroup label ="Value and derivative">
-              <option nroot="0" order="D S1+S2" col="purple" interpolationof="$f(k)$ | $f'(k)$" interpolationwith="$beta1$ | $beta2$">D S1+S2(#)</option>
+              <option nroot="0" order="D S1+S2" img="S1+S2.svg" col="purple" interpolationof="$f(k)$ | $f'(k)$" interpolationwith="$beta1$ | $beta2$">D S1+S2(#)</option>
               <option nroot="0" order="D S2+S3" img="D S2+S3.svg" col="purple" interpolationof="$f(k)$ | $f'(k)$" interpolationwith="$beta2$ | $beta3$">D S2+S3(#)</option>
               <option nroot="2" order="D S4+S5" img="D S4+S5.svg" col="purple" interpolationof="$f(k)$ | $f'(k)$" interpolationwith="$beta4$ | $beta5$">*D S4+S5(#)</option>
               <option nroot="0" order="D S1+S2+S3" img="D S1+S2+S3.svg" col="purple" interpolationof="$f(k)$ | $f'(k)$ right and left" interpolationwith="$beta1$ | $beta2$ | $beta3$">D S1+S2+S3(#)</option>
