@@ -56,8 +56,10 @@ var B1 = [{text:'in S1+S2 <span style=\'font-style:italic;color:#00ff00;font-siz
 var B2 = [{text:'in S1+S2 <span style=\'font-style:italic;color:#00ff00;font-size:14px\'>quadratic Bézier</span>',click: switchorder("2D S1+S2")},{text:'in S1+S2+S3 <span style=\'font-style:italic;color:#00ff00;font-size:14px\'>cubic Bézier</span>',click: switchorder("2D S1+S2+S3")}];
 var A2 = {text:'Interpolation of f(k) and f\'(k)',next:[{text:'1D',next:B1},{text:'2D',next:B2}]}
 
+var A3 = {text:'Interpolation of f(k) and f\'\'(k)',next:[{text:'in S3+S5',click:switchorder("D2 S3+S5")},{text:'in S3+S4',click:switchorder("D2 S3+S4")}]}
 
-A = new accordion([A0,A1,A2])
+
+A = new accordion([A0,A1,A2,A3])
 
 setTimeout(function(){H = new helperview()},100)
 
