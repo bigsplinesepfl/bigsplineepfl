@@ -294,6 +294,7 @@ class Point{
     newNoeud.setAttribute('id',"Point_"+id);
     newNoeud.setAttribute("draggable","true")
     newNoeud.setAttribute("fill","url(#g1)")
+    newNoeud.setAttribute("fill","blue")
     newNoeud.setAttribute("stroke-width",R/4)
     newNoeud.setAttribute("stroke","white")
     newGroup.appendChild(newNoeud)
@@ -406,6 +407,7 @@ class Point{
     newH1.setAttribute("height",hsize)
     newH1.setAttribute("width",hsize)
     newH1.setAttribute("fill","url(#g2)")
+    newH1.setAttribute("fill","blue")
     newH1.setAttribute("stroke-width",0.0)
     newH1.setAttribute("stroke","white")
     newH1.setAttribute("x",-disth)
@@ -423,6 +425,7 @@ class Point{
     newH2.setAttribute("height",hsize)
     newH2.setAttribute("width",hsize)
     newH2.setAttribute("fill","url(#g2)")
+    newH2.setAttribute("fill","blue")
     newH2.setAttribute("stroke-width",0.0)
     newH2.setAttribute("stroke","white")
     newH2.setAttribute("x",disth-hsize)
@@ -1957,3 +1960,35 @@ Array.from(document.getElementsByClassName("control")).forEach(function(element)
     }
   });
 });
+function download(filename, text) {
+  var element = document.createElement('a');
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+  element.setAttribute('download', filename);
+
+  element.style.display = 'none';
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
+}
+
+function to_svg(){
+  var str = "";
+  var E = svg.cloneNode(true)
+  E.removeAttribute("width")
+  E.setAttribute("xmlns","http://www.w3.org/2000/svg")
+  E.setAttribute("transform","translate(-10 0)scale(1.5 1.5)")
+  E.setAttribute("viewBox","0 6 28 9")
+  var svgNS = "http://www.w3.org/2000/svg";
+  // var newText = document.createElementNS(svgNS,"text");
+  // newText.setAttributeNS(null,"x",4.5);
+  // newText.setAttributeNS(null,"y",7);
+  // newText.setAttributeNS(null,"font-size","0.4");
+  // var textNode = document.createTextNode("S"+ordre);
+  // newText.appendChild(textNode);
+  // E.appendChild(newText);
+  E.getElementById("splinefit2").remove()
+  str += E.outerHTML;
+  download("toto_"+ordre+".svg",str)
+}

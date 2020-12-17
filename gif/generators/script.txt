@@ -1,0 +1,1 @@
+convert -delay 150 -loop 0 -density 100 -background none -dispose previous -transparent white *.pdf toto.gif
