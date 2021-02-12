@@ -1,4 +1,4 @@
-//Small class to display a menu 
+//Small class to display a menu
 class accordion{
   constructor(data,opt){
     opt = opt || {};
@@ -47,7 +47,6 @@ class accordion{
 
       if(data != undefined){
         for(var toto of data){
-          console.log(toto,data)
           var lit = document.createElement('li');
           var a = document.createElement('a');
 
@@ -155,7 +154,6 @@ class helperview{
     this.h2 = document.createElement('img');
     this.h2.src = "./images/helper2.png";
     this.Dom.appendChild(this.h2);
-    console.log(A.width())
     this.h2.style.cssText = "transform:translate(3%,40%);top:"+(Rect.y)+";left:"+(A.width())+";height:150px;position:absolute;"
 
     document.body.appendChild(this.Dom);
