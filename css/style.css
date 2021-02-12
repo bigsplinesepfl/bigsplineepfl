@@ -79,7 +79,7 @@ body{
 }
 
 #showControlPoints{
-  background-image: url('./images/eye.svg');
+  background-image: url('../images/eye.svg');
 }
 
 .control{
