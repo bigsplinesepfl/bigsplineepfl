@@ -1,1 +1,0 @@
-convert -delay 100 -loop 0 -dispose previous -density 10000 *.svg toto.gif

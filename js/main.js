@@ -1,8 +1,10 @@
 
 //////////////////////////////////
 /// Genral parameters ///////////
-/////////////////////////////////
-var R = 0.15;//Control points radius
+////////////////////////////////
+
+/// Graphics
+var R = 0.15;//disc radius
 var npt = 30;//Number of control points
 var height = parseInt(0.8/0.8*(npt)*window.innerHeight/window.innerWidth/2)*2;//Height of the plot (Y amplitude)
 var width = parseInt(0.8/0.8*window.innerWidth);
@@ -10,11 +12,13 @@ var dx = 0.04;//Step size for the lines plotted
 var Points = [];//List of Control points
 var Xm = 0;//Mouse X position
 var Ym = 0;//Mouse Y position
-var eps = 0.000001;//epsilon, fitting error controle
+var eps = 0.000001;//epsilon, inverse filtering precision
+
+/// Choice of multispline space
 var ordre = 0;//Spline order
-var MultiSpline = "";//MultiSpline?
-var tini = 0;
-//Poles registration
+var MultiSpline = "";//MultiSpline
+
+//Poles registration for inverse filtering
 var poles = {};
 poles[2] = [Math.sqrt(8)-3];
 poles[3] = [Math.sqrt(3)-2];
@@ -24,20 +28,12 @@ poles[6] = [-0.488295,-0.0816793,-0.00141415];
 poles[7] = [-0.53528,-0.122555,-0.00914869];
 
 var IdCurve = 0;//Curve id
-var dragging = -1;//COntrole point currently being dragged
-var draggingSort = ""; //Dragging control point, handlers...
-var dragginghelper = -1;
+var dragging = -1;//Id of the object currently being dragged
+var draggingSort = ""; //Type of dragged object (control point, handlers...)
+var dragginghelper = -1; //Vertical line displayed when dragging
 
 
-window.mobileCheck = function() {
-  let check = false;
-  (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4))) check = true;})(navigator.userAgent||navigator.vendor||window.opera);
-  return check;
-};
 
-if(window.mobileCheck()){
-  alert("This website was not designed for mobile devices. You should rather visit it with a computer.")
-}
 function switchorder(order){
   var ans = function(){
     document.getElementById("SelectOrder").value = document.querySelector('option[order=\''+order+'\']').value
@@ -99,89 +95,89 @@ document.getElementById("PredefinedCurves").addEventListener("change",function()
   c = new curve();
   switch(this.options[this.selectedIndex].value){
     case "sinx":
-      for(var elt of Points.val){
-        c.setYVal(x=>Math.sin(x)*height/4+height/2)
-        elt.moveY(Math.sin(elt.x)*height/4+height/2)
-      }
+    for(var elt of Points.val){
+      c.setYVal(x=>Math.sin(x)*height/4+height/2)
+      elt.moveY(Math.sin(elt.x)*height/4+height/2)
+    }
     break;
     case "sin2x":
-      for(var elt of Points.val){
-        c.setYVal(x=>Math.sin(2*x)*height/4+height/2)
-        elt.moveY(Math.sin(2*elt.x)*height/4+height/2)
-      }
+    for(var elt of Points.val){
+      c.setYVal(x=>Math.sin(2*x)*height/4+height/2)
+      elt.moveY(Math.sin(2*elt.x)*height/4+height/2)
+    }
     break;
     case "sin3x":
-      for(var elt of Points.val){
-        c.setYVal(x=>Math.sin(3*x)*height/4+height/2)
-        elt.moveY(Math.sin(3*elt.x)*height/4+height/2)
-      }
+    for(var elt of Points.val){
+      c.setYVal(x=>Math.sin(3*x)*height/4+height/2)
+      elt.moveY(Math.sin(3*elt.x)*height/4+height/2)
+    }
     break;
     case "x2":
-      for(var elt of Points.val){
-        c.setYVal(x=>(-(((x-npt/2+1/2)/npt*2)**2)*height+height))
-        elt.moveY(-(((elt.x-npt/2)/npt*2+1/2)**2)*height+height)
-      }
+    for(var elt of Points.val){
+      c.setYVal(x=>(-(((x-npt/2+1/2)/npt*2)**2)*height+height))
+      elt.moveY(-(((elt.x-npt/2)/npt*2+1/2)**2)*height+height)
+    }
     break;
     case "x":
-      for(var elt of Points.val){
-        c.setYVal(x=>(-(((x-npt/2+1/2)/npt))*height/4+height/2))
-        elt.moveY(-(((elt.x-npt/2)/npt*2+1/2))*height/4+height/2)
-      }
+    for(var elt of Points.val){
+      c.setYVal(x=>(-(((x-npt/2+1/2)/npt))*height/4+height/2))
+      elt.moveY(-(((elt.x-npt/2)/npt*2+1/2))*height/4+height/2)
+    }
     break;
     case "x6":
-      for(var elt of Points.val){
-        c.setYVal(x=>(-(((x-npt/2+1/2)/npt*2)**6)*height+height-1))
-        elt.moveY(-(((elt.x-npt/2+1/2)/npt*2)**6)*height+height-1)
-      }
+    for(var elt of Points.val){
+      c.setYVal(x=>(-(((x-npt/2+1/2)/npt*2)**6)*height+height-1))
+      elt.moveY(-(((elt.x-npt/2+1/2)/npt*2)**6)*height+height-1)
+    }
     break;
     case "0":
-      for(var elt of Points.val){
-        c.setYVal(x=>-1)
-        elt.moveY(height/2)
-      }
+    for(var elt of Points.val){
+      c.setYVal(x=>-1)
+      elt.moveY(height/2)
+    }
     break;
     case "rand":
-      for(var elt of Points.val){
-        elt.moveY(height/2+height/2*(0.5-Math.random()))
-        c.setYVal(x=>-1)
-      }
+    for(var elt of Points.val){
+      elt.moveY(height/2+height/2*(0.5-Math.random()))
+      c.setYVal(x=>-1)
+    }
     break;
     case "hat5":
-      var n0 = Math.floor(npt/2)-1;
-      for(var elt of Points.val){
-        c.setYVal(x=>height/2-height/4*(Math.abs(x - n0)<=2))
-        elt.moveY(height/2-height/4*(Math.abs(elt.x - n0)<=2))
-      }
+    var n0 = Math.floor(npt/2)-1;
+    for(var elt of Points.val){
+      c.setYVal(x=>height/2-height/4*(Math.abs(x - n0)<=2))
+      elt.moveY(height/2-height/4*(Math.abs(elt.x - n0)<=2))
+    }
     break;
     case "H1":
-      var n0 = Math.floor(npt/2)-1;
-      for(var elt of Points.val){
-        // c.setYVal(x=>height/2-H1((x-n0)/2))
-        // elt.moveY(height/2-H1((elt.x-n0)/2))
-        c.setYVal(x=>height/2-H1((x-n0)/2)-H2Left((x-n0)/2)+H2Right((x-n0)/2))
-        elt.moveY(height/2-H1((elt.x-n0)/2))
-      }
+    var n0 = Math.floor(npt/2)-1;
+    for(var elt of Points.val){
+      // c.setYVal(x=>height/2-H1((x-n0)/2))
+      // elt.moveY(height/2-H1((elt.x-n0)/2))
+      c.setYVal(x=>height/2-H1((x-n0)/2)-H2Left((x-n0)/2)+H2Right((x-n0)/2))
+      elt.moveY(height/2-H1((elt.x-n0)/2))
+    }
     break;
     case "H2":
-      var n0 = Math.floor(npt/2)-1;
-      for(var elt of Points.val){
-        c.setYVal(x=>height/2-10*BetaPlus((x-n0)/2,2))
-        elt.moveY(height/2-10*BetaPlus((elt.x-n0)/2,2))
-      }
+    var n0 = Math.floor(npt/2)-1;
+    for(var elt of Points.val){
+      c.setYVal(x=>height/2-10*BetaPlus((x-n0)/2,2))
+      elt.moveY(height/2-10*BetaPlus((elt.x-n0)/2,2))
+    }
     break;
     case "DS1S2_1":
-      var n0 = Math.floor(npt/2)-1;
-      for(var elt of Points.val){
-        c.setYVal(x=>height/2-DS1S2_1((x-n0)))
-        elt.moveY(height/2-DS1S2_1((elt.x-n0)))
-      }
+    var n0 = Math.floor(npt/2)-1;
+    for(var elt of Points.val){
+      c.setYVal(x=>height/2-DS1S2_1((x-n0)))
+      elt.moveY(height/2-DS1S2_1((elt.x-n0)))
+    }
     break;
     case "DS1S2_2":
-      var n0 = Math.floor(npt/2)-1;
-      for(var elt of Points.val){
-        c.setYVal(x=>height/2-DS1S2_2((x-n0)))
-        elt.moveY(height/2-DS1S2_2((elt.x-n0)))
-      }
+    var n0 = Math.floor(npt/2)-1;
+    for(var elt of Points.val){
+      c.setYVal(x=>height/2-DS1S2_2((x-n0)))
+      elt.moveY(height/2-DS1S2_2((elt.x-n0)))
+    }
     break;
   }
 
@@ -199,19 +195,21 @@ document.addEventListener('mouseup',function(){
     switch (draggingSort) {
       case "handle1":
       case "handle2":
-        dragging.unselectHandle()
-        dragging.unselect()
-        break;
+      dragging.unselectHandle()
+      dragging.unselect()
+      break;
       default:
-        dragging.unselectHandle()
-        dragging.unselect()
-    try{dragginghelper.delete();}
-    catch{}
-  }
+      dragging.unselectHandle()
+      dragging.unselect()
+      try{dragginghelper.delete();}
+      catch{}
+    }
   }
   dragging = -1;
   document.body.style.cursor=""
 })
+
+
 document.onmousemove = function(e){
   Xm = e.clientX;
   Ym = e.clientY;
@@ -221,48 +219,48 @@ document.onmousemove = function(e){
     switch (draggingSort) {
       case "handle1":
       case "handle2":
-        var PosM = ChangementRepere(Xm,Ym)
-        if(dragging.groupHandles){
-          var theta = Math.atan((PosM[1]-dragging.y)/(PosM[0]-dragging.x))/Math.PI*180;
-          dragging.theta = theta;
-          var dist = Math.max(0,Math.sqrt((PosM[1]-dragging.y)**2+(PosM[0]-dragging.x)**2))
-          dragging.l1 = dist;
-          dragging.l2 = dist;
+      var PosM = ChangementRepere(Xm,Ym)
+      if(dragging.groupHandles){
+        var theta = Math.atan((PosM[1]-dragging.y)/(PosM[0]-dragging.x))/Math.PI*180;
+        dragging.theta = theta;
+        var dist = Math.max(0,Math.sqrt((PosM[1]-dragging.y)**2+(PosM[0]-dragging.x)**2))
+        dragging.l1 = dist;
+        dragging.l2 = dist;
+      }
+      else{
+        currentHandle = (draggingSort.indexOf("1")>-1?1:2);
+        if(currentHandle == 1){
+          var theta = Math.atan((PosM[1]-dragging.y)/Math.min(PosM[0]-dragging.x,-0))/Math.PI*180;
+          var dist = Math.max(0,Math.sqrt((PosM[1]-dragging.y)**2+Math.min(PosM[0]-dragging.x,-0)**2));
+          if(MultiSpline!=0 && MultiSpline.indexOf("2D") != -1 & (PosM[0]-dragging.x)>0){
+            theta = 180 - Math.atan((PosM[1]-dragging.y)/Math.min(-PosM[0]+dragging.x,-0))/Math.PI*180;
+            dist = Math.max(0,Math.sqrt((PosM[1]-dragging.y)**2+Math.min(-PosM[0]+dragging.x,-0)**2));
+          }
         }
         else{
-          currentHandle = (draggingSort.indexOf("1")>-1?1:2);
-          if(currentHandle == 1){
-            var theta = Math.atan((PosM[1]-dragging.y)/Math.min(PosM[0]-dragging.x,-0))/Math.PI*180;
-            var dist = Math.max(0,Math.sqrt((PosM[1]-dragging.y)**2+Math.min(PosM[0]-dragging.x,-0)**2));
-            if(MultiSpline!=0 && MultiSpline.indexOf("2D") != -1 & (PosM[0]-dragging.x)>0){
-              theta = 180 - Math.atan((PosM[1]-dragging.y)/Math.min(-PosM[0]+dragging.x,-0))/Math.PI*180;
-              dist = Math.max(0,Math.sqrt((PosM[1]-dragging.y)**2+Math.min(-PosM[0]+dragging.x,-0)**2));
-            }
+          var theta = Math.atan((PosM[1]-dragging.y)/Math.max(PosM[0]-dragging.x,0))/Math.PI*180;
+          var dist = Math.max(0,Math.sqrt((PosM[1]-dragging.y)**2+Math.max(PosM[0]-dragging.x,0)**2))
+          if(MultiSpline!=0 && MultiSpline.indexOf("2D") != -1 & (PosM[0]-dragging.x)<0){
+            theta = 180 - Math.atan((PosM[1]-dragging.y)/Math.max(-PosM[0]+dragging.x,0))/Math.PI*180;
+            dist = Math.max(0,Math.sqrt((PosM[1]-dragging.y)**2+Math.max(-PosM[0]+dragging.x,0)**2))
           }
-          else{
-            var theta = Math.atan((PosM[1]-dragging.y)/Math.max(PosM[0]-dragging.x,0))/Math.PI*180;
-            var dist = Math.max(0,Math.sqrt((PosM[1]-dragging.y)**2+Math.max(PosM[0]-dragging.x,0)**2))
-            if(MultiSpline!=0 && MultiSpline.indexOf("2D") != -1 & (PosM[0]-dragging.x)<0){
-              theta = 180 - Math.atan((PosM[1]-dragging.y)/Math.max(-PosM[0]+dragging.x,0))/Math.PI*180;
-              dist = Math.max(0,Math.sqrt((PosM[1]-dragging.y)**2+Math.max(-PosM[0]+dragging.x,0)**2))
-            }
-          }
-          dragging["theta"+currentHandle] = Math.min(Math.max(theta,-90),90);// + (parseFloat(currentHandle)-1)*180;
-          dragging["theta"+currentHandle] =theta;
-          dragging["l"+currentHandle] = dist;
         }
-        dragging.selectHandle()
-        Points.redraw();
-        break;
+        dragging["theta"+currentHandle] = Math.min(Math.max(theta,-90),90);// + (parseFloat(currentHandle)-1)*180;
+        dragging["theta"+currentHandle] =theta;
+        dragging["l"+currentHandle] = dist;
+      }
+      dragging.selectHandle()
+      Points.redraw();
+      break;
       default:
       var y0 = Math.min(height,Math.max(0.0001,ChangementRepere(0,Ym)[1]));
-        dragging.moveY(y0)
-        dragging.select();
-        if(MultiSpline!=0 && MultiSpline.indexOf("2D") != -1){
-          dragging.moveX(Math.min(width,Math.max(0,ChangementRepere(Xm,0)[0])))
-        }
-        Points.redraw();
-        document.getElementById("measurements").innerHTML = Approx(-y0+height/2,0.01)
+      dragging.moveY(y0)
+      dragging.select();
+      if(MultiSpline!=0 && MultiSpline.indexOf("2D") != -1){
+        dragging.moveX(Math.min(width,Math.max(0,ChangementRepere(Xm,0)[0])))
+      }
+      Points.redraw();
+      document.getElementById("measurements").innerHTML = Approx(-y0+height/2,0.01)
     }
 
   }
@@ -278,7 +276,7 @@ document.addEventListener("touchmove",function(e){
   Xm = e.touches[0].clientX;
   Ym = e.touches[0].clientY;
   if(dragging != -1){
-            document.body.style.cursor="move"
+    document.body.style.cursor="move"
     dragging.moveY(Math.min(height,Math.max(0,ChangementRepere(0,Ym)[1])))
     Points.redraw();
   }
@@ -342,7 +340,6 @@ class Point{
         Points.id(id).unselect();
         document.body.style.cursor=""
       }
-
 
     })
     this.x = x;
@@ -487,152 +484,151 @@ class Point{
       document.body.style.cursor=""
       var idt = this.getAttribute('id').split("_")[1];
       if(dragging == -1 | dragging !=-1 && dragging.id !=idt){
-      Points.id(idt).unselectHandle()}
+        Points.id(idt).unselectHandle()}
 
-    })
-    // newH1.addEventListener('mouseout',function(){
-    //   document.body.style.cursor=""
-    // })
-    // newH2.addEventListener('mouseout',function(){
-    //   document.body.style.cursor=""
-    // })
-  }
-
-  removeHandles(){
-    if(this.hasHandle){
-      this.domB().remove()
-      this.hasHandle = false
-    }
-  }
-
-  dom(){
-    return(document.getElementById("Point_"+this.id))
-  }
-
-  domG(){
-    return(document.getElementById("GPoint_"+this.id))
-  }
-
-  domB(){
-    return(document.getElementById("BPoint_"+this.id))
-  }
-
-  domH1(){
-    return(document.getElementById("Handle1_"+this.id))
-  }
-
-  domH2(){
-    return(document.getElementById("Handle2_"+this.id))
-  }
-
-  domL1(){
-    return(document.getElementById("LinePoint1_"+this.id))
-  }
-
-  domRect1(){
-    return(document.getElementById("RectHandle1_"+this.id))
-  }
-
-  domRect2(){
-    return(document.getElementById("RectHandle2_"+this.id))
-  }
-
-  domL2(){
-    return(document.getElementById("LinePoint2_"+this.id))
-  }
-
-  select(){
-    this.opacity = 0.5;
-    this.r = 2*R;
-    this.redraw()
-  }
-
-  unselect(){
-    this.opacity = 1;
-    this.r = R;
-    this.redraw();
-  }
-
-  selectHandle(){
-    this.opacityHandle = 0.5;
-    this.hsize = 2*R;
-    this.redraw()
-  }
-
-  unselectHandle(){
-    this.opacityHandle = 1;
-    this.hsize= 3/2*R;
-    this.redraw();
-  }
-
-
-  redraw(){
-    var pt = this.dom();
-    pt.setAttribute('cx',0)
-    pt.setAttribute('cy',0)
-    pt.setAttribute('r',this.r)
-    pt.setAttribute('opacity',this.opacity)
-    var Gpt = this.domG();
-    Gpt.setAttribute('transform','translate('+this.x+','+this.y+')')
-    if(MultiSpline == "D S2+S4"){
-      Gpt.setAttribute('transform','translate('+(this.x+1)+','+this.y+')')
+      })
+      // newH1.addEventListener('mouseout',function(){
+      //   document.body.style.cursor=""
+      // })
+      // newH2.addEventListener('mouseout',function(){
+      //   document.body.style.cursor=""
+      // })
     }
 
-    if(this.hasHandle){
-      if(MultiSpline=="2D S1+S2"){
-        var idp = this.id-3
-        if(idp>-1){
-
-          var ps = Points.id(idp)
-          var xh = this.x+(this.l1-this.hsize/2)*Math.cos(this.theta1/180*Math.PI+Math.PI)
-          var yh = this.y+(this.l1-this.hsize/2)*Math.sin(this.theta1/180*Math.PI+Math.PI)
-          ps.l2 = Math.sqrt((xh-ps.x)**2+(yh-ps.y)**2)
-
-          ps.theta2 = Math.atan((yh-ps.y)/(xh-ps.x))/Math.PI*180
-          if(xh-ps.x<0){
-            ps.theta2-=180;
-          }
-        }
-
+    removeHandles(){
+      if(this.hasHandle){
+        this.domB().remove()
+        this.hasHandle = false
       }
-      this.domB().setAttribute("transform","rotate("+this.theta+")")
-      this.domH1().setAttribute("transform","rotate("+this.theta1+")")
-      this.domH2().setAttribute("transform","rotate("+this.theta2+")")
-      this.domL1().setAttribute("x1",-this.l1)
-      this.domRect1().setAttribute("height",this.hsize)
-      this.domRect2().setAttribute("height",this.hsize)
-      this.domRect1().setAttribute("width",this.hsize)
-      this.domRect2().setAttribute("width",this.hsize)
-      this.domL2().setAttribute("x2",this.l2)
-      this.domRect1().setAttribute("x",-this.l1)
-      this.domRect2().setAttribute("x",this.l2-this.hsize)
-      this.domRect1().setAttribute("y",-this.hsize/2)
-      this.domRect2().setAttribute("y",-this.hsize/2)
-      this.domRect1().setAttribute('opacity',this.opacityHandle)
-      this.domRect2().setAttribute('opacity',this.opacityHandle)
     }
-    //pt.setAttribute('cy',this.y)
-    //pt.setAttribute('r',this.r)
-  }
 
-  moveY(y){
-    this.y = y;
-    this.redraw();
-  }
+    dom(){
+      return(document.getElementById("Point_"+this.id))
+    }
 
-  moveX(x){
-    this.x = x;
-    this.redraw();
-  }
+    domG(){
+      return(document.getElementById("GPoint_"+this.id))
+    }
 
-  hide(){
-    this.domG().setAttribute('visibility','hidden')
-  }
+    domB(){
+      return(document.getElementById("BPoint_"+this.id))
+    }
 
-  show(){
-    this.domG().setAttribute('visibility','show')
+    domH1(){
+      return(document.getElementById("Handle1_"+this.id))
+    }
+
+    domH2(){
+      return(document.getElementById("Handle2_"+this.id))
+    }
+
+    domL1(){
+      return(document.getElementById("LinePoint1_"+this.id))
+    }
+
+    domRect1(){
+      return(document.getElementById("RectHandle1_"+this.id))
+    }
+
+    domRect2(){
+      return(document.getElementById("RectHandle2_"+this.id))
+    }
+
+    domL2(){
+      return(document.getElementById("LinePoint2_"+this.id))
+    }
+
+    select(){
+      this.opacity = 0.5;
+      this.r = 2*R;
+      this.redraw()
+    }
+
+    unselect(){
+      this.opacity = 1;
+      this.r = R;
+      this.redraw();
+    }
+
+    selectHandle(){
+      this.opacityHandle = 0.5;
+      this.hsize = 2*R;
+      this.redraw()
+    }
+
+    unselectHandle(){
+      this.opacityHandle = 1;
+      this.hsize= 3/2*R;
+      this.redraw();
+    }
+
+    redraw(){
+      var pt = this.dom();
+      pt.setAttribute('cx',0)
+      pt.setAttribute('cy',0)
+      pt.setAttribute('r',this.r)
+      pt.setAttribute('opacity',this.opacity)
+      var Gpt = this.domG();
+      Gpt.setAttribute('transform','translate('+this.x+','+this.y+')')
+      if(MultiSpline == "D S2+S4"){
+        Gpt.setAttribute('transform','translate('+(this.x+1)+','+this.y+')')
+      }
+
+      if(this.hasHandle){
+        if(MultiSpline=="2D S1+S2"){
+          var idp = this.id-3
+          if(idp>-1){
+
+            var ps = Points.id(idp)
+            var xh = this.x+(this.l1-this.hsize/2)*Math.cos(this.theta1/180*Math.PI+Math.PI)
+            var yh = this.y+(this.l1-this.hsize/2)*Math.sin(this.theta1/180*Math.PI+Math.PI)
+            ps.l2 = Math.sqrt((xh-ps.x)**2+(yh-ps.y)**2)
+
+            ps.theta2 = Math.atan((yh-ps.y)/(xh-ps.x))/Math.PI*180
+            if(xh-ps.x<0){
+              ps.theta2-=180;
+            }
+          }
+
+        }
+        this.domB().setAttribute("transform","rotate("+this.theta+")")
+        this.domH1().setAttribute("transform","rotate("+this.theta1+")")
+        this.domH2().setAttribute("transform","rotate("+this.theta2+")")
+        this.domL1().setAttribute("x1",-this.l1)
+        this.domRect1().setAttribute("height",this.hsize)
+        this.domRect2().setAttribute("height",this.hsize)
+        this.domRect1().setAttribute("width",this.hsize)
+        this.domRect2().setAttribute("width",this.hsize)
+        this.domL2().setAttribute("x2",this.l2)
+        this.domRect1().setAttribute("x",-this.l1)
+        this.domRect2().setAttribute("x",this.l2-this.hsize)
+        this.domRect1().setAttribute("y",-this.hsize/2)
+        this.domRect2().setAttribute("y",-this.hsize/2)
+        this.domRect1().setAttribute('opacity',this.opacityHandle)
+        this.domRect2().setAttribute('opacity',this.opacityHandle)
+      }
+      //pt.setAttribute('cy',this.y)
+      //pt.setAttribute('r',this.r)
+    }
+
+    moveY(y){
+      this.y = y;
+      this.redraw();
+    }
+
+    moveX(x){
+      this.x = x;
+      this.redraw();
+    }
+
+    hide(){
+      this.domG().setAttribute('visibility','hidden')
+    }
+
+    show(){
+      this.domG().setAttribute('visibility','show')
+    }
   }
-}
 
 class p{
   constructor(){
@@ -859,7 +855,6 @@ class p{
     }
   }
   redraw(){
-    tini = performance.now()
     Points.removeHandles();
     var xl = this.axis.val;
     //Coeffs
@@ -881,19 +876,19 @@ class p{
 
       }
       else if(MultiSpline == "2D S1+S2+S3"){
-      Points.addHandles(3,false);
-      var s = FitHermiteS1S2S3(this.axis.val,intercal([this.posY(),this.DY_l2D(),this.DY_r2D()]));
-      var xl = FitHermiteS1S2S3(this.axis.val,intercal([this.posX2D(),this.DX_l2D(),this.DX_r2D()]));
+        Points.addHandles(3,false);
+        var s = FitHermiteS1S2S3(this.axis.val,intercal([this.posY(),this.DY_l2D(),this.DY_r2D()]));
+        var xl = FitHermiteS1S2S3(this.axis.val,intercal([this.posX2D(),this.DX_l2D(),this.DX_r2D()]));
       }
       else if(MultiSpline == "2D2 S3+S4"){
-      Points.addHandles();
-      var s = FitH1H2S3S4(this.axis.val,this.posY(),this.DY2D())
-      var xl = FitH1H2S3S4(this.axis.val,this.posX2D(),this.DX2D())
+        Points.addHandles();
+        var s = FitH1H2S3S4(this.axis.val,this.posY(),this.DY2D())
+        var xl = FitH1H2S3S4(this.axis.val,this.posX2D(),this.DX2D())
       }
       else if(MultiSpline == "2D S1+S2"){
-      Points.addHandles(3,false);
-      var s = FitDS1S2(this.axis.val,intercal([this.posY(),this.DY_l2D()]));
-      var xl = FitDS1S2(this.axis.val,intercal([this.posX2D(),this.DX_l2D()]));
+        Points.addHandles(3,false);
+        var s = FitDS1S2(this.axis.val,intercal([this.posY(),this.DY_l2D()]));
+        var xl = FitDS1S2(this.axis.val,intercal([this.posX2D(),this.DX_l2D()]));
       }
       else{
         Points.replace()
@@ -943,28 +938,28 @@ class p{
 
     this.dom().setAttribute('d',List2Path(xl,s));
     //Temp pour afficher deux courbes
-  //   if(MultiSpline!=0 && MultiSpline.indexOf("D")>-1){
-  //   var ordreold = ordre;
-  //   ordre = 2
-  //   var MultiSplineold = MultiSpline
-  //   MultiSpline = "D S4+S5";
-  //   //Points.addHandles();
-  //   var s = FitH1H2S4S5(this.axis.val,this.posY(),this.DY())
-  //   this.dom2().setAttribute('d',List2Path(xl,s));
-  //   ordre = ordreold;
-  //   MultiSpline = MultiSplineold;
-  // }
+    //   if(MultiSpline!=0 && MultiSpline.indexOf("D")>-1){
+    //   var ordreold = ordre;
+    //   ordre = 2
+    //   var MultiSplineold = MultiSpline
+    //   MultiSpline = "D S4+S5";
+    //   //Points.addHandles();
+    //   var s = FitH1H2S4S5(this.axis.val,this.posY(),this.DY())
+    //   this.dom2().setAttribute('d',List2Path(xl,s));
+    //   ordre = ordreold;
+    //   MultiSpline = MultiSplineold;
+    // }
   }
 }
 
 function intercal(Ll){
-ans = [];
-for(var i = 0;i<Ll[0].length;i++){
-  for( var toto of Ll){
-    ans.push(toto[i])
+  ans = [];
+  for(var i = 0;i<Ll[0].length;i++){
+    for( var toto of Ll){
+      ans.push(toto[i])
+    }
   }
-}
-return(ans)
+  return(ans)
 }
 
 class curve{
@@ -1053,15 +1048,15 @@ class grid{
       gd.removeChild(gd.firstChild);
     }
     for(var i = 0;i < npt/this.dx;i++){
-        var newL = document.createElementNS('http://www.w3.org/2000/svg','line');
-        newL.setAttribute('x1',i*this.dx);
-        newL.setAttribute('x2',i*this.dx);
-        newL.setAttribute('y1',0);
-        newL.setAttribute('y2',height);
-        newL.setAttribute('stroke-width',0.01);
-        newL.setAttribute('stroke','gray');
-        newL.setAttribute('stroke-dasharray',"0.1 0.05");
-        gd.appendChild(newL);
+      var newL = document.createElementNS('http://www.w3.org/2000/svg','line');
+      newL.setAttribute('x1',i*this.dx);
+      newL.setAttribute('x2',i*this.dx);
+      newL.setAttribute('y1',0);
+      newL.setAttribute('y2',height);
+      newL.setAttribute('stroke-width',0.01);
+      newL.setAttribute('stroke','gray');
+      newL.setAttribute('stroke-dasharray',"0.1 0.05");
+      gd.appendChild(newL);
     }
 
     //Horizontal Line
@@ -1151,11 +1146,11 @@ function BetaPlus(x,nordre){
 }
 
 function Phi1(x){
-    return(0+(x<=2)*(x>-2)*(12*BetaPlus(x/2,2) + 4*BetaPlus(x/2+1,2) - 8*BetaPlus(x/2,1) - 1*BetaPlus(x/2+1,1)))
+  return(0+(x<=2)*(x>-2)*(12*BetaPlus(x/2,2) + 4*BetaPlus(x/2+1,2) - 8*BetaPlus(x/2,1) - 1*BetaPlus(x/2+1,1)))
 }
 
 function Phi2(x){
-    return(0+(x<=2)*(x>0)*(4*BetaPlus(x/2,1) - 8*BetaPlus(x/2,2)))
+  return(0+(x<=2)*(x>0)*(4*BetaPlus(x/2,1) - 8*BetaPlus(x/2,2)))
 }
 
 function Eta(x,N,N0,j){
@@ -1215,7 +1210,7 @@ function FitMulti(x,c){
   //     //ans.push(Phi2((xi-10))+10)
   //   }
   // }
-    return(ans)
+  return(ans)
 
 }
 
@@ -1311,30 +1306,30 @@ function FitDS1S2(x,c){
 
 //Spline cubique de Hermite 1
 function H1(x){
-return(0+(Math.abs(x)>=0)*(Math.abs(x)<=1)*(2*Math.abs(x)+1)*(Math.abs(x)-1)**2)
+  return(0+(Math.abs(x)>=0)*(Math.abs(x)<=1)*(2*Math.abs(x)+1)*(Math.abs(x)-1)**2)
 }
 
 //Spline cubique de Hermite 2
 function H2(x){
-return((0+(Math.abs(x)>=0)*(Math.abs(x)<=1)*x*(Math.abs(x)-1)**2))
+  return((0+(Math.abs(x)>=0)*(Math.abs(x)<=1)*x*(Math.abs(x)-1)**2))
 }
 
 //Spline cubique de Hermite 2 left
 function H2Left(x){
-return((0+(x>=-1)*(x<=0)*x*(Math.abs(x)-1)**2))
+  return((0+(x>=-1)*(x<=0)*x*(Math.abs(x)-1)**2))
 }
 
 function H2Right(x){
-return((0+(x>=0)*(x<=1)*x*(Math.abs(x)-1)**2))
+  return((0+(x>=0)*(x<=1)*x*(Math.abs(x)-1)**2))
 }
 
 //S1 + S2 avec derivee
 function DS1S2_2(x){
-return((x>-2)*(x<0)*(x+2)*x)
+  return((x>-2)*(x<0)*(x+2)*x)
 }
 
 function DS1S2_1(x){
-return((x>=0)*(x<2)*(x-2)**2/4 +(x<0)*(x>-2)*(1-x**2/4))
+  return((x>=0)*(x<2)*(x-2)**2/4 +(x<0)*(x>-2)*(1-x**2/4))
 }
 function c1(x){
   return((x<=1)*0.5*(x>-1))
@@ -1411,45 +1406,45 @@ function ConvertToInterpolationCoefficients(c,z,Tolerance,opt){
   //Cas genral on retourne la reponse impulsionnelle de 1/produit (1-z0z**-1)(1-z0**-1z**-1)
   if(MultiSpline != 0 && (MultiSpline == "2D2 S3+S4" | MultiSpline.indexOf("2D") == -1)){
     for(var k =0;k<NbPoles;k++){
-        c[0] = InitialCausalCoefficient(c, DataLength, z[k], Tolerance)
-        //Causal Filtering
-        for(var n = 1;n<DataLength;n++){
-          c[n] += z[k] * c[n - 1]
-        }
-        c[DataLength - 1] = (z[k] / (z[k] * z[k] - 1.0))* (z[k] * c[DataLength - 2] + c[DataLength - 1])
-        //Anti-Causal Filtering
-        for(var n = DataLength-2;n>-1;n--){
-            c[n] = z[k] * (c[n+1]- c[n])
+      c[0] = InitialCausalCoefficient(c, DataLength, z[k], Tolerance)
+      //Causal Filtering
+      for(var n = 1;n<DataLength;n++){
+        c[n] += z[k] * c[n - 1]
+      }
+      c[DataLength - 1] = (z[k] / (z[k] * z[k] - 1.0))* (z[k] * c[DataLength - 2] + c[DataLength - 1])
+      //Anti-Causal Filtering
+      for(var n = DataLength-2;n>-1;n--){
+        c[n] = z[k] * (c[n+1]- c[n])
 
-        }
-        for(var n = 0;n<DataLength;n++){
-          c[n] = -c[n]
-        }
+      }
+      for(var n = 0;n<DataLength;n++){
+        c[n] = -c[n]
+      }
     }
   }
   //Cas particulier cf papiers
   else if((opt.ordre == undefined & ordre>1) | opt.ordre>1){
     if (DataLength == 1){
-        return
+      return
     }
     for(var k =0;k<NbPoles;k++){
       Lambda = Lambda * (1.0 - z[k]) * (1.0 - 1.0 / z[k])
     }
     for(var n =0;n<DataLength;n++){
-         c[n] *= Lambda
+      c[n] *= Lambda
     }
     for(var k =0;k<NbPoles;k++){
-        c[0] = InitialCausalCoefficient(c, DataLength, z[k], Tolerance)
-        //Causal Filtering
-        for(var n = 1;n<DataLength;n++){
-          c[n] += z[k] * c[n - 1]
-        }
-        c[DataLength - 1] = (z[k] / (z[k] * z[k] - 1.0))* (z[k] * c[DataLength - 2] + c[DataLength - 1])
-        //Anti-Causal Filtering
-        for(var n = DataLength-2;n>-1;n--){
-            c[n] = z[k] * (c[n+1]- c[n])
-            //c[n] = z[k] * (c[n+1]- c[n])
-        }
+      c[0] = InitialCausalCoefficient(c, DataLength, z[k], Tolerance)
+      //Causal Filtering
+      for(var n = 1;n<DataLength;n++){
+        c[n] += z[k] * c[n - 1]
+      }
+      c[DataLength - 1] = (z[k] / (z[k] * z[k] - 1.0))* (z[k] * c[DataLength - 2] + c[DataLength - 1])
+      //Anti-Causal Filtering
+      for(var n = DataLength-2;n>-1;n--){
+        c[n] = z[k] * (c[n+1]- c[n])
+        //c[n] = z[k] * (c[n+1]- c[n])
+      }
     }
   }
   return(c)
@@ -1463,59 +1458,59 @@ function PWSum(Arr1,Arr2){
 function FitH1H2S4S5(x,Y,DY){
   //Y = pos function en y
   //DY = dérivée
-   //Voir rapport pour explications
-   //C11 0.125 z -0.125  & -0.1z+0.1
-   var C1 = Y.map(function(a, i){
-     if(i == Y.length-1){
-       return(16*(0.125*a +0.125*Y[i-1] +2*(- 0.1*DY[i-1]+0.1*DY[i])))
-     }
-     else{
-       return(16*(0.125*a+0.125*Y[i+1] +2*(- 0.1*DY[i+1]+0.1*DY[i])))
-     }
-   });
+  //Voir rapport pour explications
+  //C11 0.125 z -0.125  & -0.1z+0.1
+  var C1 = Y.map(function(a, i){
+    if(i == Y.length-1){
+      return(16*(0.125*a +0.125*Y[i-1] +2*(- 0.1*DY[i-1]+0.1*DY[i])))
+    }
+    else{
+      return(16*(0.125*a+0.125*Y[i+1] +2*(- 0.1*DY[i+1]+0.1*DY[i])))
+    }
+  });
 
-   var C2 = Y.map(function(a, i){
-     if(i == Y.length-1){
-       return(16*(1.25*a-1.25*Y[i-1] + 2*(0.5*DY[i-1]+0.5*DY[i])))
-     }
-     else{
+  var C2 = Y.map(function(a, i){
+    if(i == Y.length-1){
+      return(16*(1.25*a-1.25*Y[i-1] + 2*(0.5*DY[i-1]+0.5*DY[i])))
+    }
+    else{
 
-       return(16*(1.25*a-1.25*Y[i+1] + 2*(0.5*DY[i+1]+0.5*DY[i])))
-     }
-   });
-   ordre = 2
+      return(16*(1.25*a-1.25*Y[i+1] + 2*(0.5*DY[i+1]+0.5*DY[i])))
+    }
+  });
+  ordre = 2
 
-   C1 = ConvertToInterpolationCoefficients(C1,[3-Math.sqrt(8)],eps)
-   C2 = ConvertToInterpolationCoefficients(C2,[3-Math.sqrt(8)],eps)
+  C1 = ConvertToInterpolationCoefficients(C1,[3-Math.sqrt(8)],eps)
+  C2 = ConvertToInterpolationCoefficients(C2,[3-Math.sqrt(8)],eps)
 
-   return(FitNFunction(x,[C1,C2],[[H1H2S4S5_1,3],[H1H2S4S5_2,3]]))
+  return(FitNFunction(x,[C1,C2],[[H1H2S4S5_1,3],[H1H2S4S5_2,3]]))
 
 }
 
 function FitH1H2S3S5(x,Y,DDY){
   //Y = pos function en y
   //DY = dérivée
-   //Voir rapport pour explications
-   //C11 0.125 z -0.125  & -0.1z+0.1
-   //On multiplie DDY sinon pas pratique
-   var coeffDDY = 5;
-   var C1 = Y.map(function(a, i){
-     ip1 = (i+1)>Y.length-1?i-1:i+1;
-     im1 = i-1<0?i+1:i-1;
-       return(-30/7*(Y[ip1]+2/30*coeffDDY*DDY[ip1]))
-   });
+  //Voir rapport pour explications
+  //C11 0.125 z -0.125  & -0.1z+0.1
+  //On multiplie DDY sinon pas pratique
+  var coeffDDY = 5;
+  var C1 = Y.map(function(a, i){
+    ip1 = (i+1)>Y.length-1?i-1:i+1;
+    im1 = i-1<0?i+1:i-1;
+    return(-30/7*(Y[ip1]+2/30*coeffDDY*DDY[ip1]))
+  });
 
-   var C2 = Y.map(function(a, i){
-     ip1 = (i+1)>Y.length-1?i-1:i+1;
-     im1 = i-1<0?i+1:i-1;
-       return(-30/7*(2*Y[i] - Y[ip1] - Y[im1] + 1/6*coeffDDY*DDY[ip1]+ 1/6*coeffDDY*DDY[im1] + 4/6*coeffDDY*DDY[i]))
-   });
-   ordre = 2
+  var C2 = Y.map(function(a, i){
+    ip1 = (i+1)>Y.length-1?i-1:i+1;
+    im1 = i-1<0?i+1:i-1;
+    return(-30/7*(2*Y[i] - Y[ip1] - Y[im1] + 1/6*coeffDDY*DDY[ip1]+ 1/6*coeffDDY*DDY[im1] + 4/6*coeffDDY*DDY[i]))
+  });
+  ordre = 2
 
-   C1 = ConvertToInterpolationCoefficients(C1,[-8/7+Math.sqrt(15)/7],eps)
-   C2 = ConvertToInterpolationCoefficients(C2,[-8/7+Math.sqrt(15)/7],eps)
+  C1 = ConvertToInterpolationCoefficients(C1,[-8/7+Math.sqrt(15)/7],eps)
+  C2 = ConvertToInterpolationCoefficients(C2,[-8/7+Math.sqrt(15)/7],eps)
 
-   return(FitNFunction(x,[C1,C2],[[H1H2S3S5_1,4],[H1H2S3S5_2,4]]))
+  return(FitNFunction(x,[C1,C2],[[H1H2S3S5_1,4],[H1H2S3S5_2,4]]))
 
 }
 
@@ -1523,55 +1518,55 @@ function FitS3S4(x,Y){
 
   //Y = pos function en y
   //DY = dérivée
-   //Voir rapport pour explications
-   //C11 0.125 z -0.125  & -0.1z+0.1
-   var C1 = []
-   for(var i=0;i<Math.floor(Y.length/2);i++){
-     i0 = 2*i
-     ip1 = (i0+2)>Y.length-1?i0-2:i0+2;
-     im1 = i0-2<0?i0+2:i0-2;
-     C1[i] = (-(Y[ip1] + Y[im1] - 8 * Y[i0]))
-   }
+  //Voir rapport pour explications
+  //C11 0.125 z -0.125  & -0.1z+0.1
+  var C1 = []
+  for(var i=0;i<Math.floor(Y.length/2);i++){
+    i0 = 2*i
+    ip1 = (i0+2)>Y.length-1?i0-2:i0+2;
+    im1 = i0-2<0?i0+2:i0-2;
+    C1[i] = (-(Y[ip1] + Y[im1] - 8 * Y[i0]))
+  }
 
-   var C2 = []
-   for(var i=0;i<Math.floor(Y.length/2);i++){
-     i0 = 2*i
-     i1 = Math.min(i0+1,Y.length-1)
-     ip1 = (i0+2)>Y.length-1?i0-2:i0+2;
-     im1 = i0-2<0?i0+2:i0-2;
+  var C2 = []
+  for(var i=0;i<Math.floor(Y.length/2);i++){
+    i0 = 2*i
+    i1 = Math.min(i0+1,Y.length-1)
+    ip1 = (i0+2)>Y.length-1?i0-2:i0+2;
+    im1 = i0-2<0?i0+2:i0-2;
     C2[i] = (-5*(Y[ip1] + Y[i0])+16*Y[i1])
-   }
+  }
 
-   ordre = 2
+  ordre = 2
 
-   C1 = ConvertToInterpolationCoefficients(C1,[4-Math.sqrt(15)],eps)
-   C2 = ConvertToInterpolationCoefficients(C2,[4-Math.sqrt(15)],eps)
+  C1 = ConvertToInterpolationCoefficients(C1,[4-Math.sqrt(15)],eps)
+  C2 = ConvertToInterpolationCoefficients(C2,[4-Math.sqrt(15)],eps)
 
-   return(FitNFunction(x,[C1,C2],[[H1H2S3S4_1,4],[H1H2S3S4_2,4]]))
+  return(FitNFunction(x,[C1,C2],[[H1H2S3S4_1,4],[H1H2S3S4_2,4]]))
 
 }
 
 function FitH1H2S2S4(x,Y,DY){
   //Y = pos function en y
   //DY = dérivée, mais on doit multiplier par 2
-   //Voir rapport pour explications
-   //C11 0.125 z -0.125  & -0.1z+0.1
-   var C1 = Y.map(function(a, i){
-     ip1 = (i+1)>Y.length-1?i-1:i+1;
-     im1 = i-1<0?i+1:i-1;
-       return(-32/7*(Y[i] + 2*3/32*(DY[ip1] - DY[i])))
-   });
+  //Voir rapport pour explications
+  //C11 0.125 z -0.125  & -0.1z+0.1
+  var C1 = Y.map(function(a, i){
+    ip1 = (i+1)>Y.length-1?i-1:i+1;
+    im1 = i-1<0?i+1:i-1;
+    return(-32/7*(Y[i] + 2*3/32*(DY[ip1] - DY[i])))
+  });
 
-   var C2 = Y.map(function(a, i){
-     ip1 = (i+1)>Y.length-1?i-1:i+1;
-     im1 = i-1<0?i+1:i-1;
-       return(-32/7*( -Y[i] + Y[im1] + 2/8*(DY[im1]+DY[ip1] + 6*DY[i])))
-   });
-   ordre = 2
+  var C2 = Y.map(function(a, i){
+    ip1 = (i+1)>Y.length-1?i-1:i+1;
+    im1 = i-1<0?i+1:i-1;
+    return(-32/7*( -Y[i] + Y[im1] + 2/8*(DY[im1]+DY[ip1] + 6*DY[i])))
+  });
+  ordre = 2
 
-   C1 = ConvertToInterpolationCoefficients(C1,[-9/7+Math.sqrt(32)/7],eps)
-   C2 = ConvertToInterpolationCoefficients(C2,[-9/7+Math.sqrt(32)/7],eps)
-   return(FitNFunction(x,[C1,C2],[[H1H2S2S4_1,4],[H1H2S2S4_2,4]]))
+  C1 = ConvertToInterpolationCoefficients(C1,[-9/7+Math.sqrt(32)/7],eps)
+  C2 = ConvertToInterpolationCoefficients(C2,[-9/7+Math.sqrt(32)/7],eps)
+  return(FitNFunction(x,[C1,C2],[[H1H2S2S4_1,4],[H1H2S2S4_2,4]]))
 
 }
 
@@ -1580,50 +1575,50 @@ function FitH1H2S3S4(x,Y,DY){
   var coeffDDY = 5;
   //Y = pos function en y
   //DY = dérivée, mais on doit multiplier par 2
-   //Voir rapport pour explications
-   //C11 0.125 z -0.125  & -0.1z+0.1
-   var C1 = Y.map(function(a, i){
-      return(Y[i])
-   });
+  //Voir rapport pour explications
+  //C11 0.125 z -0.125  & -0.1z+0.1
+  var C1 = Y.map(function(a, i){
+    return(Y[i])
+  });
 
-   var C2 = Y.map(function(a, i){
-     ip1 = (i+1)>Y.length-1?i-1:i+1;
-     im1 = i-1<0?i+1:i-1;
-       return(Y[i]/2 + Y[ip1]/2 - coeffDDY*DY[ip1]/6)
-   });
-   return(FitNFunction(x,[C1,C2],[[H1H2S3S4_1,4],[H1H2S3S4_2,4]]))
+  var C2 = Y.map(function(a, i){
+    ip1 = (i+1)>Y.length-1?i-1:i+1;
+    im1 = i-1<0?i+1:i-1;
+    return(Y[i]/2 + Y[ip1]/2 - coeffDDY*DY[ip1]/6)
+  });
+  return(FitNFunction(x,[C1,C2],[[H1H2S3S4_1,4],[H1H2S3S4_2,4]]))
 
 }
 
 function FitH1H2S6S7(x,Y,DY){
   //Y = pos function en y
   //DY = dérivée
-   //Voir rapport pour explications
-   //C11 0.125 z -0.125  & -0.1z+0.1
-   var C1 = Y.map(function(a, i){
-     if(i == Y.length-1){
-       return(16*(0.125*a +0.125*Y[i-1] +2*(- 0.1*DY[i-1]+0.1*DY[i])))
-     }
-     else{
-       return(16*(0.125*a+0.125*Y[i+1] +2*(- 0.1*DY[i+1]+0.1*DY[i])))
-     }
-   });
+  //Voir rapport pour explications
+  //C11 0.125 z -0.125  & -0.1z+0.1
+  var C1 = Y.map(function(a, i){
+    if(i == Y.length-1){
+      return(16*(0.125*a +0.125*Y[i-1] +2*(- 0.1*DY[i-1]+0.1*DY[i])))
+    }
+    else{
+      return(16*(0.125*a+0.125*Y[i+1] +2*(- 0.1*DY[i+1]+0.1*DY[i])))
+    }
+  });
 
-   var C2 = Y.map(function(a, i){
-     if(i == Y.length-1){
-       return(16*(1.25*a-1.25*Y[i-1] + 2*(0.5*DY[i-1]+0.5*DY[i])))
-     }
-     else{
+  var C2 = Y.map(function(a, i){
+    if(i == Y.length-1){
+      return(16*(1.25*a-1.25*Y[i-1] + 2*(0.5*DY[i-1]+0.5*DY[i])))
+    }
+    else{
 
-       return(16*(1.25*a-1.25*Y[i+1] + 2*(0.5*DY[i+1]+0.5*DY[i])))
-     }
-   });
-   ordre = 2
+      return(16*(1.25*a-1.25*Y[i+1] + 2*(0.5*DY[i+1]+0.5*DY[i])))
+    }
+  });
+  ordre = 2
 
-   C1 = ConvertToInterpolationCoefficients(C1,[3-Math.sqrt(8)],eps)
-   C2 = ConvertToInterpolationCoefficients(C2,[3-Math.sqrt(8)],eps)
+  C1 = ConvertToInterpolationCoefficients(C1,[3-Math.sqrt(8)],eps)
+  C2 = ConvertToInterpolationCoefficients(C2,[3-Math.sqrt(8)],eps)
 
-   return(FitNFunction(x,[C1,C2],[[H1H2S6S7_1,4],[H1H2S6S7_2,4]]))
+  return(FitNFunction(x,[C1,C2],[[H1H2S6S7_1,4],[H1H2S6S7_2,4]]))
 
 }
 
@@ -1664,13 +1659,13 @@ var H1H2S3S4_2 = x=>functionFromCoeff(x,[[0.0, 0.0, 0.0, -1, 1], [0.0, 1, 3, -8,
 function InitialCausalCoefficient(c,DataLength,z,Tolerance){
   var Horizon = Math.ceil(Math.log(Tolerance) / Math.log(Math.abs(z)))
   if(DataLength < Horizon){
-      Horizon = DataLength;
+    Horizon = DataLength;
   }
   var zn = z
   var Sum = c[0]
   for(var n = 1;n<Horizon;n++){
-      Sum += zn * c[n]
-      zn *= z
+    Sum += zn * c[n]
+    zn *= z
   }
   return(Sum+0.0)
 }
@@ -1688,41 +1683,41 @@ function SplineSupport(){
 }
 
 function BoundaryIndex(index){
-    if(index>=npt){
-      return((npt-1)-(index-(npt-1)))
-    }
-    else if(index<0){
-      return(-index)
-    }
-    else{
-      return(index)
-    }
+  if(index>=npt){
+    return((npt-1)-(index-(npt-1)))
+  }
+  else if(index<0){
+    return(-index)
+  }
+  else{
+    return(index)
+  }
 
 }
 
 function BoundaryIndex2(index){
-    if(index>=npt/2){
-      return((npt/2-1)-(index-(npt/2-1)))
-    }
-    else if(index<0){
-      return(-index)
-    }
-    else{
-      return(index)
-    }
+  if(index>=npt/2){
+    return((npt/2-1)-(index-(npt/2-1)))
+  }
+  else if(index<0){
+    return(-index)
+  }
+  else{
+    return(index)
+  }
 
 }
 
 function BoundaryIndexN(index,N){
-    if(index>=npt/N){
-      return((npt/N-1)-(index-(npt/N-1)))
-    }
-    else if(index<0){
-      return(-index)
-    }
-    else{
-      return(index)
-    }
+  if(index>=npt/N){
+    return((npt/N-1)-(index-(npt/N-1)))
+  }
+  else if(index<0){
+    return(-index)
+  }
+  else{
+    return(index)
+  }
 
 }
 
@@ -1830,12 +1825,12 @@ function AutoMove2(t,dt,cv){
 }
 
 function plotcurve(fck,col="black"){
-var ut = new curve()
-var n0 = Math.floor(npt/2)-1;
+  var ut = new curve()
+  var n0 = Math.floor(npt/2)-1;
 
-ut.setYVal(x=>fck(x-n0)-Math.floor(height/2))
-ut.col(col)
-ut.redraw();
+  ut.setYVal(x=>fck(x-n0)-Math.floor(height/2))
+  ut.col(col)
+  ut.redraw();
 }
 //plotcurve(H1,"red");
 //plotcurve(x=>3*H2Right(x/3),"red");
@@ -1866,24 +1861,24 @@ ut.redraw();
 // u3.redraw();
 
 function testcoeff(f){
-var cc = [0];
-var ct = [0];
-for(var i = 1;i<Math.floor(f.length/2);i++){
-  ct.push(2*f[2*(i-1)+1]-2*cc[i-1]-ct[i-1])
-  cc.push(f[2*(i-1)+2]-ct[i])
-}
-return([cc,ct])
+  var cc = [0];
+  var ct = [0];
+  for(var i = 1;i<Math.floor(f.length/2);i++){
+    ct.push(2*f[2*(i-1)+1]-2*cc[i-1]-ct[i-1])
+    cc.push(f[2*(i-1)+2]-ct[i])
+  }
+  return([cc,ct])
 }
 
 function testcoeff2(f){
-var cc = [0];
-var ct = [0];
-for(var i = 1;i<Math.floor(f.length/2);i++){
+  var cc = [0];
+  var ct = [0];
+  for(var i = 1;i<Math.floor(f.length/2);i++){
 
-  cc.push(4*f[2*i]-2*ct[i-1]-cc[i-1])
-  ct.push(4*f[2*i+1]-ct[i-1]-2*cc[i])
-}
-return([cc,ct])
+    cc.push(4*f[2*i]-2*ct[i-1]-cc[i-1])
+    ct.push(4*f[2*i+1]-ct[i-1]-2*cc[i])
+  }
+  return([cc,ct])
 }
 
 //remplace dans un str les expressions latex
@@ -1926,13 +1921,13 @@ document.getElementById("Languette").addEventListener("drag",function(e){
 })
 
 document.getElementById("Languette").addEventListener("dragstart",function(e){
-    document.getElementById("Languette").style.backgroundColor = "#00000000"
+  document.getElementById("Languette").style.backgroundColor = "#00000000"
 
 
 })
 
 document.getElementById("Languette").addEventListener("dragend",function(e){
-    document.getElementById("Languette").style.backgroundColor = "black"
+  document.getElementById("Languette").style.backgroundColor = "black"
 
 })
 
@@ -1943,23 +1938,25 @@ Array.from(document.getElementsByClassName("control")).forEach(function(element)
 
     switch (element.id) {
       case "showControlPoints":
-        if(element.getAttribute("visible")=="true"){
-          Points.hideControlPoints()
-          element.setAttribute("visible","false")
-        }
-        else{
-          Points.showControlPoints()
-          element.setAttribute("visible","true")
-          Points.redraw()
-        }
+      if(element.getAttribute("visible")=="true"){
+        Points.hideControlPoints()
+        element.setAttribute("visible","false")
+      }
+      else{
+        Points.showControlPoints()
+        element.setAttribute("visible","true")
+        Points.redraw()
+      }
 
 
-        break;
+      break;
       default:
 
     }
   });
 });
+
+
 function download(filename, text) {
   var element = document.createElement('a');
   element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
@@ -1991,4 +1988,15 @@ function to_svg(){
   E.getElementById("splinefit2").remove()
   str += E.outerHTML;
   download("toto_"+ordre+".svg",str)
+}
+
+// If mobilephone -> alert
+window.mobileCheck = function() {
+  let check = false;
+  (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4))) check = true;})(navigator.userAgent||navigator.vendor||window.opera);
+  return check;
+};
+
+if(window.mobileCheck()){
+  alert("This website was not designed for mobile devices. You should rather visit it with a computer.")
 }

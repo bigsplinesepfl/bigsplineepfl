@@ -1,7 +1,8 @@
+//Small class to display a menu 
 class accordion{
   constructor(data,opt){
     opt = opt || {};
-    //Main contaimer
+    //Main container
     opt.name = opt.name || Math.floor(100000*Math.random());
     opt.oneatthetime = opt.oneatthetime || false;
     this.name = name;
