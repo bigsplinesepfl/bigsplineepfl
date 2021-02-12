@@ -1398,12 +1398,15 @@ function Fitc12t12(x,cc,ct){
 }
 
 function ConvertToInterpolationCoefficients(c,z,Tolerance,opt){
+  //c = list of the measurements (eg list of position on the grid)
+  //z = list of the roots
+  //Tolerance -> precision
   opt = opt || {};
   var DataLength = c.length
   z = z || [];
   var NbPoles = z.length;
   var Lambda = 1.0
-  //Cas genral on retourne la reponse impulsionnelle de 1/produit (1-z0z**-1)(1-z0**-1z**-1)
+  //Multispline case
   if(MultiSpline != 0 && (MultiSpline == "2D2 S3+S4" | MultiSpline.indexOf("2D") == -1)){
     for(var k =0;k<NbPoles;k++){
       c[0] = InitialCausalCoefficient(c, DataLength, z[k], Tolerance)
@@ -1422,7 +1425,7 @@ function ConvertToInterpolationCoefficients(c,z,Tolerance,opt){
       }
     }
   }
-  //Cas particulier cf papiers
+  //General Case
   else if((opt.ordre == undefined & ordre>1) | opt.ordre>1){
     if (DataLength == 1){
       return
@@ -1443,7 +1446,6 @@ function ConvertToInterpolationCoefficients(c,z,Tolerance,opt){
       //Anti-Causal Filtering
       for(var n = DataLength-2;n>-1;n--){
         c[n] = z[k] * (c[n+1]- c[n])
-        //c[n] = z[k] * (c[n+1]- c[n])
       }
     }
   }
